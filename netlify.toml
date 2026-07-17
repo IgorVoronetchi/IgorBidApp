@@ -1,7 +1,8 @@
 [build]
   base = "frontend"
   command = "npm run build"
-  publish = "frontend/dist/frontend/browser"
+  # relativ la `base`, nu la radacina repo-ului
+  publish = "dist/frontend/browser"
 
 # Angular e un SPA cu routing pe client - fara asta, un refresh pe /auctions
 # sau orice ruta non-radacina ar primi 404 de la Netlify.
