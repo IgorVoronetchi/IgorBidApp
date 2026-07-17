@@ -1,5 +1,4 @@
-// Inlocuieste cu URL-ul public al backend-ului deployat (ex: https://bid-app-igor-api.onrender.com/api)
-// inainte de a face build de productie / a deploy-ui pe Netlify.
+// Configuratia de productie - backend-ul live de pe Render.
 export const environment = {
-  apiUrl: 'https://REPLACE-WITH-YOUR-BACKEND-URL.example.com/api',
+  apiUrl: 'https://igorbidapp.onrender.com/api',
 };
