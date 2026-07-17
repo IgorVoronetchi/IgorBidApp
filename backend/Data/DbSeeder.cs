@@ -1,4 +1,3 @@
-using System.Text;
 using Backend.Models;
 using Backend.Services;
 
@@ -7,31 +6,12 @@ namespace Backend.Data
     public static class DbSeeder
     {
         /// <summary>
-        /// Genereaza o ilustratie SVG auto-continuta (gradient + emoji), ca data URI.
-        /// Continut generat de server, nu de utilizator -> sigur de randat direct in <img src>.
-        /// Evita orice dependenta de retea / poze externe pentru datele demo.
+        /// Poza demo de pe Unsplash (licenta libera, hotlink permis pe CDN-ul lor).
+        /// Stocam doar URL-ul in baza de date; octetii imaginii raman pe CDN.
+        /// Parametrii cer o varianta redimensionata la 800px, comprimata - suficient pentru carduri.
         /// </summary>
-        private static string Img(string emoji, string colorA, string colorB)
-        {
-            string svg = $"""
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
-                <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="{colorA}"/>
-                <stop offset="100%" stop-color="{colorB}"/>
-                </linearGradient></defs>
-                <rect width="400" height="300" fill="url(#g)"/>
-                <text x="200" y="168" font-size="120" text-anchor="middle" dominant-baseline="middle">{emoji}</text>
-                </svg>
-                """;
-            var bytes = Encoding.UTF8.GetBytes(svg);
-            return "data:image/svg+xml;base64," + Convert.ToBase64String(bytes);
-        }
-
-        private static readonly (string A, string B) Electronics = ("#2563EB", "#06B6D4");
-        private static readonly (string A, string B) Art = ("#7C3AED", "#C026D3");
-        private static readonly (string A, string B) Auto = ("#334155", "#4F46E5");
-        private static readonly (string A, string B) Collectibles = ("#D97706", "#F59E0B");
-        private static readonly (string A, string B) Fashion = ("#DB2777", "#F472B6");
+        private static string Unsplash(string photoId) =>
+            $"https://images.unsplash.com/{photoId}?w=800&q=80&auto=format&fit=crop";
 
         public static void Seed(ApplicationDbContext db)
         {
@@ -68,105 +48,105 @@ namespace Backend.Data
                 Name = "Vintage Zenit-E Film Camera", Category = electronics, StartPrice = 150, CurrentPrice = 320,
                 StartDate = now.AddDays(-3), EndDate = now.AddHours(2).AddMinutes(14), Location = "Cluj-Napoca",
                 Description = "Fully working Soviet-era 35mm SLR with Helios 44-2 lens. Light meter functional, minor cosmetic wear on the top plate. Comes with original leather case.",
-                Owner = vlad, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("📷", Electronics.A, Electronics.B)
+                Owner = vlad, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1495707902641-75cac588d2e9")
             };
             var poster = new AuctionItem
             {
                 Name = "Signed Exhibition Poster, 2019", Category = art, StartPrice = 800, CurrentPrice = 1450,
                 StartDate = now.AddDays(-5), EndDate = now.AddMinutes(45), Location = "Bucuresti",
                 Description = "Limited exhibition poster, hand-signed by the artist. 70x100 cm, kept flat in acid-free sleeve. Certificate of authenticity included.",
-                Owner = galeria, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("🖼️", Art.A, Art.B)
+                Owner = galeria, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1561214115-f2f134cc4912")
             };
             var dacia = new AuctionItem
             {
                 Name = "1987 Dacia 1300, restored", Category = auto, StartPrice = 12000, CurrentPrice = 18500,
                 StartDate = now.AddDays(-7), EndDate = now.AddDays(3).AddHours(4), Location = "Pitesti",
                 Description = "Full nut-and-bolt restoration finished in 2025. Original engine rebuilt, new interior in period-correct fabric, ITP valid until 2027. A genuine head-turner.",
-                Owner = clasice, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("🚗", Auto.A, Auto.B)
+                Owner = clasice, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1489824904134-891ab64532f1")
             };
             var iphone = new AuctionItem
             {
                 Name = "iPhone 13 Pro 256GB, Sierra Blue", Category = electronics, StartPrice = 1800, CurrentPrice = 2350,
                 StartDate = now.AddDays(-2), EndDate = now.AddHours(6).AddMinutes(30), Location = "Timisoara",
                 Description = "Battery health 89%, always in case with screen protector. Box, cable and invoice included. No scratches, no repairs.",
-                Owner = tech, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("📱", Electronics.A, Electronics.B)
+                Owner = tech, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1592750475338-74b7b21085ab")
             };
             var rug = new AuctionItem
             {
                 Name = "Handwoven Maramures Wool Rug", Category = art, StartPrice = 400, CurrentPrice = 640,
                 StartDate = now.AddDays(-4), EndDate = now.AddDays(1).AddHours(2), Location = "Baia Mare",
                 Description = "Traditional 160x230 cm rug, hand-woven with natural dyes by a local artisan. Never used, from a smoke-free home.",
-                Owner = ioana, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("🧵", Art.A, Art.B)
+                Owner = ioana, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1600166898405-da9535204843")
             };
             var omega = new AuctionItem
             {
                 Name = "Omega Seamaster, 1970s", Category = collectibles, StartPrice = 5000, CurrentPrice = 7200,
                 StartDate = now.AddDays(-6), EndDate = now.AddHours(5).AddMinutes(12), Location = "Bucuresti",
                 Description = "Automatic cal. 1012, recently serviced with papers. Original dial with beautiful patina, 36mm steel case. Runs +4s/day.",
-                Owner = watchVault, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("⌚", Collectibles.A, Collectibles.B)
+                Owner = watchVault, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1547996160-81dfa63595aa")
             };
             var pegas = new AuctionItem
             {
                 Name = "Retro Pegas Bicycle, restored", Category = collectibles, StartPrice = 700, CurrentPrice = 980,
                 StartDate = now.AddDays(-3), EndDate = now.AddHours(12).AddMinutes(45), Location = "Iasi",
                 Description = "Classic Pegas frame repainted in original teal, new tyres, chain and Brooks-style saddle. Rides like new, looks like 1985.",
-                Owner = bikeLife, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("🚲", Collectibles.A, Collectibles.B)
+                Owner = bikeLife, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1485965120184-e220f721d03e")
             };
             var bag = new AuctionItem
             {
                 Name = "Handmade Leather Messenger Bag", Category = fashion, StartPrice = 250, CurrentPrice = 310,
                 StartDate = now.AddDays(-1), EndDate = now.AddHours(3).AddMinutes(31), Location = "Brasov",
                 Description = "Full-grain vegetable-tanned leather, hand-stitched. Fits a 14\" laptop. Brass hardware, ages beautifully.",
-                Owner = galeria, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("👜", Fashion.A, Fashion.B)
+                Owner = galeria, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1547949003-9792a18a2601")
             };
             var vespa = new AuctionItem
             {
                 Name = "Vespa PX 150, 1998", Category = auto, StartPrice = 2200, CurrentPrice = 2850,
                 StartDate = now.AddDays(-2), EndDate = now.AddHours(8).AddMinutes(20), Location = "Constanta",
                 Description = "Classic two-stroke Vespa, recently serviced, new battery and tyres. Romanian title, ready to ride this summer.",
-                Owner = clasice, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("🛵", Auto.A, Auto.B)
+                Owner = clasice, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1558981403-c5f9899a28bc")
             };
             var switchConsole = new AuctionItem
             {
                 Name = "Nintendo Switch OLED + 4 games", Category = electronics, StartPrice = 900, CurrentPrice = 1150,
                 StartDate = now.AddDays(-1), EndDate = now.AddHours(4).AddMinutes(50), Location = "Oradea",
                 Description = "White OLED model, barely used, includes Zelda TOTK, Mario Kart 8, Animal Crossing and a third-party dock.",
-                Owner = mihai, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("🎮", Electronics.A, Electronics.B)
+                Owner = mihai, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1578303512597-81e6cc155b3e")
             };
             var vinylCollection = new AuctionItem
             {
                 Name = "Vinyl Record Collection (45 LPs)", Category = collectibles, StartPrice = 600, CurrentPrice = 870,
                 StartDate = now.AddDays(-3), EndDate = now.AddDays(2).AddHours(6), Location = "Bucuresti",
                 Description = "70s-80s rock and jazz, mostly VG+/NM condition, stored upright in a smoke-free room. Full list on request.",
-                Owner = vinylBar, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("💿", Collectibles.A, Collectibles.B)
+                Owner = vinylBar, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1603048588665-791ca8aea617")
             };
             var coat = new AuctionItem
             {
                 Name = "Designer Wool Coat, size M", Category = fashion, StartPrice = 350, CurrentPrice = 490,
                 StartDate = now.AddDays(-2), EndDate = now.AddDays(1).AddHours(9), Location = "Bucuresti",
                 Description = "Tailored wool-blend coat, worn twice, dry-cleaned. Original garment bag and spare buttons included.",
-                Owner = ioana, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("🧥", Fashion.A, Fashion.B)
+                Owner = ioana, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1539533018447-63fcce2678e3")
             };
             var painting = new AuctionItem
             {
                 Name = "Abstract Oil Painting, 100x80cm", Category = art, StartPrice = 1200, CurrentPrice = 1650,
                 StartDate = now.AddDays(-4), EndDate = now.AddDays(2).AddHours(14), Location = "Cluj-Napoca",
                 Description = "Original oil on canvas, contemporary Romanian artist, gallery-framed and ready to hang. Certificate included.",
-                Owner = galeria, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("🎨", Art.A, Art.B)
+                Owner = galeria, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1541961017774-22349e4a1262")
             };
             var keyboard = new AuctionItem
             {
                 Name = "Hand-built Mechanical Keyboard", Category = electronics, StartPrice = 500, CurrentPrice = 640,
                 StartDate = now.AddDays(-1), EndDate = now.AddDays(3).AddHours(1), Location = "Timisoara",
                 Description = "Custom 65% aluminium case, lubed switches, PBT keycaps. Hand-assembled, sounds and feels premium.",
-                Owner = tech, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("⌨️", Electronics.A, Electronics.B)
+                Owner = tech, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1595225476474-87563907a212")
             };
             var jeans = new AuctionItem
             {
                 Name = "Vintage Levi's 501, rare wash", Category = fashion, StartPrice = 180, CurrentPrice = 245,
                 StartDate = now.AddDays(-1), EndDate = now.AddDays(4).AddHours(5), Location = "Brasov",
                 Description = "Made in USA, 90s deadstock, W32/L34. Rare mid-blue wash, never hemmed, original red tab.",
-                Owner = mihai, Status = StatusEnum.ActiveBid, ImageDataUrl = Img("👖", Fashion.A, Fashion.B)
+                Owner = mihai, Status = StatusEnum.ActiveBid, ImageDataUrl = Unsplash("photo-1542272604-787c3835535d")
             };
             // Licitatii deja incheiate, cu castigator — pentru profil/istoric
             var lego = new AuctionItem
@@ -174,14 +154,14 @@ namespace Backend.Data
                 Name = "LEGO Technic 42083 sealed", Category = collectibles, StartPrice = 1200, CurrentPrice = 1520,
                 StartDate = now.AddDays(-10), EndDate = now.AddDays(-2), Location = "Cluj-Napoca",
                 Description = "Bugatti Chiron, sealed box, shelf-kept. Retired set.",
-                Owner = tech, Status = StatusEnum.Sold, Winner = radu, ImageDataUrl = Img("🧱", Collectibles.A, Collectibles.B)
+                Owner = tech, Status = StatusEnum.Sold, Winner = radu, ImageDataUrl = Unsplash("photo-1585366119957-e9730b6d0f60")
             };
             var camera2 = new AuctionItem
             {
                 Name = "Canon EOS 90D body only", Category = electronics, StartPrice = 2200, CurrentPrice = 2680,
                 StartDate = now.AddDays(-9), EndDate = now.AddDays(-1), Location = "Bucuresti",
                 Description = "Low shutter count, always used with a cage and ND filters. Boxed with two batteries.",
-                Owner = tech, Status = StatusEnum.Sold, Winner = ana, ImageDataUrl = Img("📸", Electronics.A, Electronics.B)
+                Owner = tech, Status = StatusEnum.Sold, Winner = ana, ImageDataUrl = Unsplash("photo-1519638831568-d9897f54ed69")
             };
             // In asteptarea validarii adminului
             var ps5 = new AuctionItem
@@ -189,28 +169,28 @@ namespace Backend.Data
                 Name = "PS5 Console + 2 DualSense controllers", Category = electronics, StartPrice = 1500, CurrentPrice = 1500,
                 StartDate = now, EndDate = now.AddDays(4), Location = "Bucuresti",
                 Description = "Disc edition, lightly used, both controllers included with charging dock.",
-                Owner = radu, Status = StatusEnum.Added, ImageDataUrl = Img("🎮", Electronics.A, Electronics.B)
+                Owner = radu, Status = StatusEnum.Added, ImageDataUrl = Unsplash("photo-1606813907291-d86efa9b94db")
             };
             var spoons = new AuctionItem
             {
                 Name = "Antique Silver Spoon Set (12 pcs)", Category = collectibles, StartPrice = 900, CurrentPrice = 900,
                 StartDate = now, EndDate = now.AddDays(5), Location = "Sibiu",
                 Description = "Hallmarked 800 silver, early 20th century, original wooden case.",
-                Owner = ioana, Status = StatusEnum.Added, ImageDataUrl = Img("🥄", Collectibles.A, Collectibles.B)
+                Owner = ioana, Status = StatusEnum.Added, ImageDataUrl = Unsplash("photo-1608039829572-78524f79c4c7")
             };
             var ski = new AuctionItem
             {
                 Name = "Ski Set Atomic 170cm + boots 43", Category = fashion, StartPrice = 600, CurrentPrice = 600,
                 StartDate = now, EndDate = now.AddDays(6), Location = "Predeal",
                 Description = "One season used, freshly waxed, bindings serviced.",
-                Owner = bikeLife, Status = StatusEnum.Added, ImageDataUrl = Img("🎿", Fashion.A, Fashion.B)
+                Owner = bikeLife, Status = StatusEnum.Added, ImageDataUrl = Unsplash("photo-1551698618-1dfe5d97d256")
             };
             var sculpture = new AuctionItem
             {
                 Name = "Small Bronze Sculpture, signed", Category = art, StartPrice = 700, CurrentPrice = 700,
                 StartDate = now, EndDate = now.AddDays(7), Location = "Bucuresti",
                 Description = "Limited edition cast, numbered 4/25, artist signature on the base.",
-                Owner = galeria, Status = StatusEnum.Added, ImageDataUrl = Img("🗿", Art.A, Art.B)
+                Owner = galeria, Status = StatusEnum.Added, ImageDataUrl = Unsplash("photo-1544413660-299165566b1d")
             };
 
             db.AuctionItems.AddRange(
