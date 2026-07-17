@@ -1,0 +1,47 @@
+<div class="shell">
+  <header class="site-header">
+    <div class="header-inner">
+      <a routerLink="/" class="logo">
+        <div class="logo-mark">B</div>
+        <span class="logo-name">Bid-App-Igor</span>
+      </a>
+      <nav class="main-nav">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ i18n.t().navHome }}</a>
+        <a routerLink="/auctions" routerLinkActive="active">{{ i18n.t().navAuctions }}</a>
+        <a routerLink="/forum" routerLinkActive="active">{{ i18n.t().navForum }}</a>
+        @if (auth.isAdmin()) {
+          <a routerLink="/admin" routerLinkActive="active" class="admin-link">{{ i18n.t().navAdmin }}</a>
+        }
+      </nav>
+      <button class="lang-btn" (click)="i18n.toggle()" title="Switch language">{{ langLabel() }}</button>
+      @if (auth.isLoggedIn()) {
+        <div class="user-area">
+          <a routerLink="/profile" class="user-chip">
+            <div class="user-avatar">{{ initials() }}</div>
+            <span class="user-name">{{ auth.user()?.userName }}</span>
+          </a>
+          <button class="logout-btn" (click)="logout()">{{ i18n.t().logout }}</button>
+        </div>
+      } @else {
+        <div class="guest-area">
+          <a routerLink="/login" class="signin-link">{{ i18n.t().signIn }}</a>
+          <a routerLink="/register" class="join-btn">{{ i18n.t().joinFree }}</a>
+        </div>
+      }
+    </div>
+  </header>
+
+  <router-outlet />
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-brand">Bid-App-Igor</span>
+      <div class="footer-links">
+        <a routerLink="/">{{ i18n.t().navHome }}</a>
+        <a routerLink="/auctions">{{ i18n.t().navAuctions }}</a>
+        <a routerLink="/forum">{{ i18n.t().navForum }}</a>
+      </div>
+      <span>{{ i18n.t().footerNote }}</span>
+    </div>
+  </footer>
+</div>

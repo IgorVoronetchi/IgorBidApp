@@ -1,0 +1,73 @@
+<main class="profile container">
+  @if (profile(); as p) {
+    <div class="profile-hero">
+      <div class="hero-avatar">{{ initials() }}</div>
+      <div class="hero-info">
+        <div class="hero-name">{{ p.userName }}</div>
+        <div class="hero-sub">{{ i18n.t().memberSince }} {{ memberSinceLabel() }}</div>
+      </div>
+      <div class="hero-rating">
+        <div class="rating-num">{{ p.rating != null ? p.rating + ' ★' : '—' }}</div>
+        <div class="rating-sub">{{ p.reviews.length }} {{ i18n.t().reviewsWord }}</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      @for (tb of tabs; track tb.key) {
+        <button class="chip" [class.active]="tab() === tb.key" (click)="tab.set(tb.key)">
+          {{ tabLabel(tb.key) }}
+        </button>
+      }
+    </div>
+
+    @if (tab() !== 'reviews') {
+      @if (tabItems().length === 0) {
+        <div class="empty-box">{{ emptyText() }}</div>
+      }
+      <div class="grid-cards">
+        @for (it of tabItems(); track it.id) {
+          <a class="item-card" [routerLink]="['/item', it.id]">
+            <div class="card-photo">
+              @if (it.imageUrl) {
+                <img class="item-photo" [src]="it.imageUrl" alt="" />
+              } @else {
+                <div class="photo-ph fill">
+                  <span>{{ i18n.cat(it.category) }}</span>
+                </div>
+              }
+            </div>
+            <div class="card-body">
+              <div class="card-name">{{ it.name }}</div>
+              <div class="card-row">
+                <span class="price">{{ i18n.fmt(it.currentPrice) }}</span>
+                @let b = badge(it);
+                <span class="status-badge" [class]="'status-badge ' + b.cls">{{ b.label }}</span>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    } @else {
+      @if (p.reviews.length === 0) {
+        <div class="empty-box">{{ emptyText() }}</div>
+      }
+      <div class="reviews-list">
+        @for (r of p.reviews; track r.id) {
+          <div class="card review-item">
+            <div class="review-head">
+              <div class="review-who">
+                <div class="avatar rev-avatar">{{ r.reviewerUserName.slice(0, 2).toUpperCase() }}</div>
+                <span class="rev-name">{{ r.reviewerUserName }}</span>
+              </div>
+              <div class="review-meta">
+                <span class="rev-stars">{{ stars(r.rating) }}</span>
+                <span class="rev-date">{{ fmtDate(r.createdAt) }}</span>
+              </div>
+            </div>
+            <p class="review-text">{{ r.comment }}</p>
+          </div>
+        }
+      </div>
+    }
+  }
+</main>

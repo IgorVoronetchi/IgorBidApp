@@ -1,0 +1,63 @@
+<main class="auctions container">
+  <h1 class="page-title">{{ i18n.t().liveAuctionsTitle }}</h1>
+
+  <div class="toolbar">
+    <input
+      class="input search"
+      [ngModel]="q"
+      (ngModelChange)="q = $event; onSearch($event)"
+      [placeholder]="i18n.t().searchPh"
+    />
+    <select class="input sort" [ngModel]="sort()" (ngModelChange)="onSort($event)">
+      <option value="ending">{{ i18n.t().sortEnding }}</option>
+      <option value="priceAsc">{{ i18n.t().sortAsc }}</option>
+      <option value="priceDesc">{{ i18n.t().sortDesc }}</option>
+      <option value="newest">{{ i18n.t().sortNew }}</option>
+    </select>
+  </div>
+
+  <div class="cats">
+    <button class="chip" [class.active]="cat() === 'All'" (click)="selectCat('All')">{{ i18n.t().catAll }}</button>
+    @for (c of categories(); track c.id) {
+      <button class="chip" [class.active]="cat() === c.name" (click)="selectCat(c.name)">{{ i18n.cat(c.name) }}</button>
+    }
+  </div>
+
+  <div class="result-count">{{ filtered().length }} {{ i18n.t().itemsWord }}</div>
+
+  <div class="grid-cards">
+    @for (it of paged(); track it.id) {
+      <div class="item-card">
+        <a class="card-photo" [routerLink]="['/item', it.id]">
+          @if (it.imageUrl) {
+            <img class="item-photo" [src]="it.imageUrl" alt="" />
+          } @else {
+            <div class="photo-ph fill">
+              <span>{{ i18n.cat(it.category) }} · {{ i18n.t().photo }}</span>
+            </div>
+          }
+        </a>
+        <div class="card-body">
+          <div class="card-head">
+            <a class="card-name" [routerLink]="['/item', it.id]">{{ it.name }}</a>
+            <button class="wish-btn" (click)="toggleWish($event, it.id)" title="Wishlist">
+              {{ wishlist.has(it.id) ? '💚' : '🤍' }}
+            </button>
+          </div>
+          <div class="card-meta">{{ it.location }} · {{ it.bidCount }} {{ i18n.t().bidsWord }}</div>
+          <div class="card-row">
+            <span class="price">{{ i18n.fmt(it.currentPrice) }}</span>
+            @let tl = ticker.timeLeft(it.endDate, i18n.t());
+            <span class="time-badge" [class.urgent]="tl.urgent">{{ tl.label }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (hasMore()) {
+    <div class="load-more-row">
+      <button class="btn-ghost load-more-btn" (click)="loadMore()">{{ i18n.t().loadMore }}</button>
+    </div>
+  }
+</main>

@@ -1,0 +1,76 @@
+<main class="sell-main">
+  <div class="sell-card">
+    <h1>{{ i18n.t().sellTitle }}</h1>
+    <p class="sell-sub">{{ i18n.t().sellSub }}</p>
+
+    @if (done()) {
+      <div class="ok-box">{{ i18n.t().sellOk }}</div>
+    } @else {
+      <div class="sell-form">
+        <label>
+          <span>{{ i18n.t().itemName }}</span>
+          <input class="input" [(ngModel)]="name" />
+        </label>
+        <div class="row-2">
+          <label>
+            <span>{{ i18n.t().category }}</span>
+            <select class="input" [(ngModel)]="categoryId">
+              @for (c of categories(); track c.id) {
+                <option [ngValue]="c.id">{{ i18n.cat(c.name) }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            <span>{{ i18n.t().location }}</span>
+            <input class="input" [(ngModel)]="location" />
+          </label>
+        </div>
+        <label>
+          <span>{{ i18n.t().description }}</span>
+          <textarea class="input" rows="3" [(ngModel)]="description"></textarea>
+        </label>
+
+        <div class="field">
+          <span class="field-label">{{ i18n.t().photoLabel }}</span>
+          @if (imagePreview()) {
+            <div class="photo-preview-wrap">
+              <img class="photo-preview" [src]="imagePreview()" alt="" />
+              <button type="button" class="btn-ghost remove-photo" (click)="removeImage()">
+                {{ i18n.t().removePhoto }}
+              </button>
+            </div>
+          } @else {
+            <label class="photo-drop">
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+              <span>{{ imageBusy() ? '…' : ('🖼 ' + i18n.t().addPhoto) }}</span>
+            </label>
+          }
+          @if (imageError()) {
+            <div class="error-box">{{ imageError() }}</div>
+          }
+        </div>
+
+        <div class="row-2">
+          <label>
+            <span>{{ i18n.t().startPrice }}</span>
+            <input class="input" type="number" min="1" [(ngModel)]="startPrice" />
+          </label>
+          <label>
+            <span>{{ i18n.t().duration }}</span>
+            <select class="input" [(ngModel)]="durationDays">
+              @for (d of [1, 3, 5, 7, 14]; track d) {
+                <option [ngValue]="d">{{ d }} {{ i18n.t().days }}</option>
+              }
+            </select>
+          </label>
+        </div>
+        @if (error()) {
+          <div class="error-box">{{ error() }}</div>
+        }
+        <button class="btn-accent submit" (click)="submit()" [disabled]="busy()">
+          {{ i18n.t().submitListing }}
+        </button>
+      </div>
+    }
+  </div>
+</main>

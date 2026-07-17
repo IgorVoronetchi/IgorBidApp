@@ -1,0 +1,42 @@
+<main class="pp container">
+  <a class="back-link" (click)="back()">← {{ i18n.t().back }}</a>
+
+  @if (notFound()) {
+    <div class="empty-box">404</div>
+  } @else if (profile(); as p) {
+    <div class="pp-hero">
+      <div class="hero-avatar">{{ initials() }}</div>
+      <div class="hero-info">
+        <div class="hero-name">{{ p.userName }}</div>
+        <div class="hero-sub">{{ i18n.t().memberSince }} {{ memberSinceLabel() }}</div>
+      </div>
+      <div class="hero-rating">
+        <div class="rating-num">{{ p.rating != null ? p.rating + ' ★' : '—' }}</div>
+        <div class="rating-sub">{{ p.completedSales }} {{ i18n.t().completedSales }}</div>
+      </div>
+    </div>
+
+    <h3 class="reviews-title">{{ i18n.t().reviewsWord }} ({{ p.reviews.length }})</h3>
+
+    @if (p.reviews.length === 0) {
+      <div class="empty-box">{{ i18n.t().emptyReviews }}</div>
+    }
+    <div class="reviews-list">
+      @for (r of p.reviews; track r.id) {
+        <div class="card review-item">
+          <div class="review-head">
+            <div class="review-who">
+              <div class="avatar rev-avatar">{{ r.reviewerUserName.slice(0, 2).toUpperCase() }}</div>
+              <span class="rev-name">{{ r.reviewerUserName }}</span>
+            </div>
+            <div class="review-meta">
+              <span class="rev-stars">{{ stars(r.rating) }}</span>
+              <span class="rev-date">{{ fmtDate(r.createdAt) }}</span>
+            </div>
+          </div>
+          <p class="review-text">{{ r.comment }}</p>
+        </div>
+      }
+    </div>
+  }
+</main>

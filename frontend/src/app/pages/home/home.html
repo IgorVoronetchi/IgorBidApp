@@ -1,0 +1,65 @@
+<main class="home">
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <div class="live-pill">
+          <span class="live-dot"></span>
+          {{ liveItems().length }} {{ i18n.t().liveNow }}
+        </div>
+        <h1>
+          {{ i18n.t().heroA }}<br>
+          {{ i18n.t().heroB }} <span class="acc">{{ i18n.t().heroC }}</span>.
+        </h1>
+        <p>{{ i18n.t().heroSub }}</p>
+        <div class="hero-ctas">
+          <a routerLink="/auctions" class="cta-main">{{ i18n.t().browseAuctions }}</a>
+          <a routerLink="/sell" class="cta-alt">{{ i18n.t().sellItem }}</a>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">{{ totalBids() }}</div>
+          <div class="stat-label">{{ i18n.t().statBidsLabel }}</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">{{ avgRating() != null ? avgRating() + '★' : '—' }}</div>
+          <div class="stat-label">{{ i18n.t().statRatingLabel }}</div>
+        </div>
+        <div class="stat wide">
+          <div class="stat-num">{{ i18n.fmt(totalTraded()) }}</div>
+          <div class="stat-label">{{ i18n.t().statTradedLabel }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="featured container">
+    <div class="featured-head">
+      <h2>🔥 {{ i18n.t().endingSoon }}</h2>
+      <a routerLink="/auctions">{{ i18n.t().seeAll }}</a>
+    </div>
+    <div class="grid-cards">
+      @for (it of featured(); track it.id) {
+        <a class="item-card" [routerLink]="['/item', it.id]">
+          <div class="card-photo">
+            @if (it.imageUrl) {
+              <img class="item-photo" [src]="it.imageUrl" alt="" />
+            } @else {
+              <div class="photo-ph fill">
+                <span>{{ i18n.cat(it.category) }} · {{ i18n.t().photo }}</span>
+              </div>
+            }
+          </div>
+          <div class="card-body">
+            <div class="card-name">{{ it.name }}</div>
+            <div class="card-row">
+              <span class="price">{{ i18n.fmt(it.currentPrice) }}</span>
+              @let tl = ticker.timeLeft(it.endDate, i18n.t());
+              <span class="time-badge" [class.urgent]="tl.urgent">{{ tl.label }}</span>
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+  </section>
+</main>

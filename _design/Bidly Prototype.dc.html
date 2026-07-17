@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --acc: #14A44D; }
+  html, body { margin: 0; padding: 0; background: #F2F6F1; color: #101B12; font-family: 'Space Grotesk', system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  a { color: var(--acc); text-decoration: none; }
+  a:hover { color: #0D7A38; }
+  input, select, textarea, button { font-family: 'Space Grotesk', system-ui, sans-serif; }
+  @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; display: flex; flex-direction: column;">
+
+  <!-- ============ HEADER ============ -->
+  <header style="position: sticky; top: 0; z-index: 50; background: #101B12; color: #F2F6F1; padding: 0 24px;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 28px; height: 64px;">
+      <div onClick="{{ goHome }}" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <div style="width: 32px; height: 32px; background: var(--acc); border-radius: 8px; display: grid; place-items: center; font-weight: 700; font-size: 18px; color: #101B12;">B</div>
+        <span style="font-weight: 700; font-size: 20px; letter-spacing: -0.5px;">BidAppSample</span>
+      </div>
+      <nav style="display: flex; gap: 4px; flex: 1;">
+        <span onClick="{{ goHome }}" style="padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 15px; color: #C9D6CB;" style-hover="background: rgba(255,255,255,0.08); color: #fff;">{{ t.navHome }}</span>
+        <span onClick="{{ goAuctions }}" style="padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 15px; color: #C9D6CB;" style-hover="background: rgba(255,255,255,0.08); color: #fff;">{{ t.navAuctions }}</span>
+        <span onClick="{{ goForum }}" style="padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 15px; color: #C9D6CB;" style-hover="background: rgba(255,255,255,0.08); color: #fff;">{{ t.navForum }}</span>
+        <sc-if value="{{ isAdminUser }}" hint-placeholder-val="{{ false }}">
+          <span onClick="{{ goAdmin }}" style="padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 15px; color: #7FD6A0;" style-hover="background: rgba(255,255,255,0.08);">{{ t.navAdmin }}</span>
+        </sc-if>
+      </nav>
+      <button onClick="{{ toggleLang }}" title="Switch language" style="background: none; border: 1px solid rgba(255,255,255,0.25); color: #C9D6CB; border-radius: 8px; padding: 7px 12px; font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: 1px;" style-hover="border-color: var(--acc); color: #fff;">{{ langLabel }}</button>
+      <sc-if value="{{ isLoggedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div onClick="{{ goProfile }}" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--acc); color: #101B12; display: grid; place-items: center; font-weight: 700; font-size: 14px;">AM</div>
+            <span style="font-size: 15px;">{{ userName }}</span>
+          </div>
+          <button onClick="{{ logout }}" style="background: none; border: 1px solid rgba(255,255,255,0.25); color: #C9D6CB; border-radius: 8px; padding: 7px 14px; font-size: 14px; cursor: pointer;" style-hover="border-color: #fff; color: #fff;">{{ t.logout }}</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isLoggedOut }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; gap: 10px;">
+          <button onClick="{{ goLogin }}" style="background: none; border: none; color: #C9D6CB; font-size: 15px; cursor: pointer; padding: 8px 12px;" style-hover="color: #fff;">{{ t.signIn }}</button>
+          <button onClick="{{ goRegister }}" style="background: var(--acc); border: none; color: #101B12; font-weight: 600; font-size: 15px; cursor: pointer; padding: 9px 18px; border-radius: 10px;" style-hover="filter: brightness(1.1);">{{ t.joinFree }}</button>
+        </div>
+      </sc-if>
+    </div>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <main data-screen-label="Home" style="flex: 1;">
+      <section style="background: #101B12; color: #F2F6F1; padding: 72px 24px 88px;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 48px; align-items: center;">
+          <div style="flex: 1; min-width: 300px;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(20,164,77,0.15); border: 1px solid rgba(20,164,77,0.4); border-radius: 999px; padding: 6px 14px; font-size: 13px; color: #7FD6A0; margin-bottom: 24px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--acc); animation: pulseDot 1.6s infinite;"></span>
+              {{ liveCount }} {{ t.liveNow }}
+            </div>
+            <h1 style="font-size: clamp(40px, 6vw, 64px); line-height: 1.02; margin: 0 0 20px; font-weight: 700; letter-spacing: -2px;">{{ t.heroA }}<br>{{ t.heroB }} <span style="color: var(--acc);">{{ t.heroC }}</span>.</h1>
+            <p style="font-size: 18px; color: #A8B8AC; margin: 0 0 32px; max-width: 440px; line-height: 1.55;">{{ t.heroSub }}</p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button onClick="{{ goAuctions }}" style="background: var(--acc); border: none; color: #101B12; font-weight: 700; font-size: 16px; cursor: pointer; padding: 14px 28px; border-radius: 12px;" style-hover="filter: brightness(1.1); transform: translateY(-1px);">{{ t.browseAuctions }}</button>
+              <button onClick="{{ goRegister }}" style="background: none; border: 1px solid rgba(255,255,255,0.25); color: #F2F6F1; font-size: 16px; cursor: pointer; padding: 14px 28px; border-radius: 12px;" style-hover="border-color: var(--acc); color: #7FD6A0;">{{ t.sellItem }}</button>
+            </div>
+          </div>
+          <div style="flex: 1; min-width: 300px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px;">
+              <div style="font-size: 34px; font-weight: 700; color: var(--acc);">{{ statBids }}</div>
+              <div style="font-size: 14px; color: #A8B8AC;">{{ t.statBidsLabel }}</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px;">
+              <div style="font-size: 34px; font-weight: 700; color: var(--acc);">4.8★</div>
+              <div style="font-size: 14px; color: #A8B8AC;">{{ t.statRatingLabel }}</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; grid-column: span 2;">
+              <div style="font-size: 34px; font-weight: 700; color: var(--acc);">86.400 lei</div>
+              <div style="font-size: 14px; color: #A8B8AC;">{{ tradedLine }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style="max-width: 1200px; margin: 0 auto; padding: 56px 24px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;">
+          <h2 style="font-size: 28px; margin: 0; letter-spacing: -1px;">🔥 {{ t.endingSoon }}</h2>
+          <a href="#" onClick="{{ goAuctionsLink }}" style="font-weight: 600; font-size: 15px;">{{ t.seeAll }}</a>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;">
+          <sc-for list="{{ featured }}" as="it" hint-placeholder-count="3">
+            <div onClick="{{ it.open }}" style="background: #fff; border-radius: 16px; overflow: hidden; cursor: pointer; border: 1px solid #E1E9E0; transition: transform 0.15s, box-shadow 0.15s;" style-hover="transform: translateY(-3px); box-shadow: 0 12px 28px rgba(16,27,18,0.1);">
+              <div style="height: 150px; background: repeating-linear-gradient(45deg, #E7EFE6, #E7EFE6 10px, #DFE9DE 10px, #DFE9DE 20px); display: grid; place-items: center;">
+                <span style="font-family: monospace; font-size: 12px; color: #6B7F6E; background: #fff; padding: 4px 10px; border-radius: 6px;">{{ it.cat }} · {{ t.photo }}</span>
+              </div>
+              <div style="padding: 16px;">
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;">{{ it.name }}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-weight: 700; font-size: 18px; color: #0D7A38;">{{ it.priceFmt }}</span>
+                  <span style="font-size: 13px; font-weight: 600; color: #C2453D; background: #FBEAE8; padding: 4px 10px; border-radius: 999px;">{{ it.timeLeft }}</span>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </main>
+  </sc-if>
+
+  <!-- ============ AUCTIONS ============ -->
+  <sc-if value="{{ isAuctions }}" hint-placeholder-val="{{ false }}">
+    <main data-screen-label="Auctions" style="flex: 1; max-width: 1200px; margin: 0 auto; padding: 40px 24px; width: 100%;">
+      <h1 style="font-size: 36px; margin: 0 0 24px; letter-spacing: -1.5px;">{{ t.liveAuctionsTitle }}</h1>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 20px;">
+        <input value="{{ q }}" onChange="{{ onQ }}" placeholder="{{ t.searchPh }}" style="flex: 1; min-width: 220px; padding: 12px 16px; border-radius: 12px; border: 1px solid #D4E0D3; background: #fff; font-size: 15px; outline: none;" style-focus="border-color: var(--acc);">
+        <select value="{{ sort }}" onChange="{{ onSort }}" style="padding: 12px 14px; border-radius: 12px; border: 1px solid #D4E0D3; background: #fff; font-size: 15px; cursor: pointer;">
+          <option value="ending">{{ t.sortEnding }}</option>
+          <option value="priceAsc">{{ t.sortAsc }}</option>
+          <option value="priceDesc">{{ t.sortDesc }}</option>
+          <option value="newest">{{ t.sortNew }}</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px;">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="5">
+          <button onClick="{{ c.pick }}" style="border: 1px solid {{ c.border }}; background: {{ c.bg }}; color: {{ c.color }}; padding: 8px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; cursor: pointer;">{{ c.name }}</button>
+        </sc-for>
+      </div>
+      <div style="font-size: 14px; color: #6B7F6E; margin-bottom: 16px;">{{ resultCount }} {{ t.itemsWord }}</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;">
+        <sc-for list="{{ filtered }}" as="it" hint-placeholder-count="6">
+          <div style="background: #fff; border-radius: 16px; overflow: hidden; border: 1px solid #E1E9E0; transition: transform 0.15s, box-shadow 0.15s;" style-hover="transform: translateY(-3px); box-shadow: 0 12px 28px rgba(16,27,18,0.1);">
+            <div onClick="{{ it.open }}" style="height: 150px; background: repeating-linear-gradient(45deg, #E7EFE6, #E7EFE6 10px, #DFE9DE 10px, #DFE9DE 20px); display: grid; place-items: center; cursor: pointer; position: relative;">
+              <span style="font-family: monospace; font-size: 12px; color: #6B7F6E; background: #fff; padding: 4px 10px; border-radius: 6px;">{{ it.cat }} · {{ t.photo }}</span>
+            </div>
+            <div style="padding: 16px;">
+              <div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start;">
+                <div onClick="{{ it.open }}" style="font-weight: 600; font-size: 16px; margin-bottom: 6px; cursor: pointer;" style-hover="color: #0D7A38;">{{ it.name }}</div>
+                <button onClick="{{ it.wish }}" title="Wishlist" style="border: none; background: none; font-size: 18px; cursor: pointer; line-height: 1; padding: 2px;">{{ it.heart }}</button>
+              </div>
+              <div style="font-size: 13px; color: #6B7F6E; margin-bottom: 10px;">{{ it.loc }} · {{ it.bidCount }} {{ t.bidsWord }}</div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 700; font-size: 18px; color: #0D7A38;">{{ it.priceFmt }}</span>
+                <span style="font-size: 13px; font-weight: 600; color: {{ it.timeColor }}; background: {{ it.timeBg }}; padding: 4px 10px; border-radius: 999px;">{{ it.timeLeft }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </main>
+  </sc-if>
+
+  <!-- ============ ITEM DETAIL ============ -->
+  <sc-if value="{{ isItem }}" hint-placeholder-val="{{ false }}">
+    <main data-screen-label="Item detail" style="flex: 1; max-width: 1200px; margin: 0 auto; padding: 32px 24px; width: 100%;">
+      <a href="#" onClick="{{ backToAuctions }}" style="font-size: 14px; font-weight: 600;">← {{ t.back }}</a>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; margin-top: 20px;">
+        <div>
+          <div style="height: 340px; border-radius: 20px; background: repeating-linear-gradient(45deg, #E7EFE6, #E7EFE6 12px, #DFE9DE 12px, #DFE9DE 24px); display: grid; place-items: center; border: 1px solid #E1E9E0;">
+            <span style="font-family: monospace; font-size: 13px; color: #6B7F6E; background: #fff; padding: 6px 14px; border-radius: 8px;">{{ dCat }} · {{ t.photo }}</span>
+          </div>
+          <div style="background: #fff; border: 1px solid #E1E9E0; border-radius: 16px; padding: 20px; margin-top: 20px;">
+            <h3 style="margin: 0 0 10px; font-size: 17px;">{{ t.description }}</h3>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #3D4E40;">{{ dDesc }}</p>
+            <div style="display: flex; gap: 20px; margin-top: 16px; font-size: 14px; color: #6B7F6E;">
+              <span>📍 {{ dLoc }}</span>
+              <span>🏷 {{ dCat }}</span>
+              <span>{{ t.startedAt }} {{ dStartFmt }}</span>
+            </div>
+          </div>
+          <div style="background: #fff; border: 1px solid #E1E9E0; border-radius: 16px; padding: 20px; margin-top: 20px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 46px; height: 46px; border-radius: 50%; background: #101B12; color: #7FD6A0; display: grid; place-items: center; font-weight: 700;">{{ dSellerInit }}</div>
+              <div style="flex: 1;">
+                <div style="font-weight: 600; font-size: 16px;">{{ dSeller }}</div>
+                <div style="font-size: 13px; color: #6B7F6E;">{{ dSellerRating }} ★ · {{ dSellerSales }} {{ t.completedSales }}</div>
+              </div>
+              <button style="border: 1px solid #D4E0D3; background: none; border-radius: 10px; padding: 8px 14px; font-size: 14px; cursor: pointer;" style-hover="border-color: var(--acc); color: #0D7A38;">{{ t.viewProfile }}</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h1 style="font-size: 30px; margin: 0 0 8px; letter-spacing: -1px; line-height: 1.15;">{{ dName }}</h1>
+          <button onClick="{{ dWish }}" style="border: 1px solid #D4E0D3; background: #fff; border-radius: 999px; padding: 7px 16px; font-size: 14px; cursor: pointer; margin-bottom: 20px;" style-hover="border-color: var(--acc);">{{ dHeartLabel }}</button>
+
+          <div style="background: #101B12; color: #F2F6F1; border-radius: 20px; padding: 24px;">
+            <div style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+              <div>
+                <div style="font-size: 13px; color: #A8B8AC; margin-bottom: 4px;">{{ t.currentBid }}</div>
+                <div style="font-size: 34px; font-weight: 700; color: var(--acc);">{{ dPriceFmt }}</div>
+                <div style="font-size: 13px; color: #A8B8AC; margin-top: 4px;">{{ t.startedAtLower }} {{ dStartPriceFmt }}</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 13px; color: #A8B8AC; margin-bottom: 4px;">{{ t.timeLeftLabel }}</div>
+                <div style="font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{ dTimeColor }};">{{ dCountdown }}</div>
+                <div style="font-size: 13px; color: #A8B8AC; margin-top: 4px;">{{ dBidCount }} {{ t.bidsSoFar }}</div>
+              </div>
+            </div>
+            <sc-if value="{{ dEnded }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top: 18px; background: rgba(20,164,77,0.15); border: 1px solid rgba(20,164,77,0.4); border-radius: 12px; padding: 14px; font-size: 15px; color: #7FD6A0;">🏆 {{ t.endedSoldTo }} <b>{{ dTopBidder }}</b> — {{ dPriceFmt }}</div>
+            </sc-if>
+            <sc-if value="{{ dActive }}" hint-placeholder-val="{{ true }}">
+              <div style="margin-top: 20px;">
+                <div style="display: flex; gap: 10px;">
+                  <input value="{{ bidValue }}" onChange="{{ onBidChange }}" placeholder="{{ minBidHint }}" inputMode="numeric" style="flex: 1; padding: 13px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; font-size: 17px; font-weight: 600; outline: none;" style-focus="border-color: var(--acc);">
+                  <button onClick="{{ placeBid }}" style="background: var(--acc); border: none; color: #101B12; font-weight: 700; font-size: 16px; cursor: pointer; padding: 13px 24px; border-radius: 12px; white-space: nowrap;" style-hover="filter: brightness(1.1);">{{ t.placeBid }}</button>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                  <button onClick="{{ quick1 }}" style="flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #C9D6CB; border-radius: 10px; padding: 8px; font-size: 14px; cursor: pointer;" style-hover="border-color: var(--acc); color: #fff;">+{{ inc1 }} lei</button>
+                  <button onClick="{{ quick2 }}" style="flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #C9D6CB; border-radius: 10px; padding: 8px; font-size: 14px; cursor: pointer;" style-hover="border-color: var(--acc); color: #fff;">+{{ inc2 }} lei</button>
+                  <button onClick="{{ quick3 }}" style="flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #C9D6CB; border-radius: 10px; padding: 8px; font-size: 14px; cursor: pointer;" style-hover="border-color: var(--acc); color: #fff;">+{{ inc3 }} lei</button>
+                </div>
+                <sc-if value="{{ hasBidError }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top: 12px; background: rgba(216,83,79,0.15); border: 1px solid rgba(216,83,79,0.5); color: #F2A9A5; border-radius: 10px; padding: 10px 14px; font-size: 14px;">{{ bidError }}</div>
+                </sc-if>
+                <sc-if value="{{ hasBidOk }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top: 12px; background: rgba(20,164,77,0.15); border: 1px solid rgba(20,164,77,0.4); color: #7FD6A0; border-radius: 10px; padding: 10px 14px; font-size: 14px;">{{ bidOk }}</div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E1E9E0; border-radius: 16px; padding: 20px; margin-top: 20px;">
+            <h3 style="margin: 0 0 14px; font-size: 17px;">{{ t.bidHistory }}</h3>
+            <sc-if value="{{ noBids }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 14px; color: #6B7F6E;">{{ t.noBids }}</div>
+            </sc-if>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <sc-for list="{{ dBids }}" as="b" hint-placeholder-count="3">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; border-radius: 10px; background: {{ b.bg }};">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #E7EFE6; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #3D4E40;">{{ b.init }}</div>
+                    <span style="font-size: 14px; font-weight: 600;">{{ b.user }}</span>
+                    <sc-if value="{{ b.top }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-size: 11px; font-weight: 700; color: #0D7A38; background: #E1F4E7; padding: 2px 8px; border-radius: 999px;">{{ t.highest }}</span>
+                    </sc-if>
+                  </div>
+                  <div style="display: flex; gap: 14px; align-items: baseline;">
+                    <span style="font-weight: 700; font-size: 15px;">{{ b.amountFmt }}</span>
+                    <span style="font-size: 12px; color: #6B7F6E;">{{ b.when }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </sc-if>
+
+  <!-- ============ LOGIN / REGISTER ============ -->
+  <sc-if value="{{ isAuth }}" hint-placeholder-val="{{ false }}">
+    <main data-screen-label="Auth" style="flex: 1; display: grid; place-items: center; padding: 60px 24px;">
+      <div style="width: 100%; max-width: 400px; background: #fff; border: 1px solid #E1E9E0; border-radius: 20px; padding: 36px;">
+        <div style="width: 40px; height: 40px; background: var(--acc); border-radius: 10px; display: grid; place-items: center; font-weight: 700; font-size: 22px; color: #101B12; margin-bottom: 20px;">B</div>
+        <h1 style="font-size: 26px; margin: 0 0 6px; letter-spacing: -1px;">{{ authTitle }}</h1>
+        <p style="margin: 0 0 24px; font-size: 14px; color: #6B7F6E;">{{ authSub }}</p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <sc-if value="{{ isRegister }}" hint-placeholder-val="{{ false }}">
+            <input value="{{ regName }}" onChange="{{ onRegName }}" placeholder="{{ t.username }}" style="padding: 13px 16px; border-radius: 12px; border: 1px solid #D4E0D3; font-size: 15px; outline: none;" style-focus="border-color: var(--acc);">
+          </sc-if>
+          <input value="{{ authEmail }}" onChange="{{ onAuthEmail }}" placeholder="Email" type="email" style="padding: 13px 16px; border-radius: 12px; border: 1px solid #D4E0D3; font-size: 15px; outline: none;" style-focus="border-color: var(--acc);">
+          <input value="{{ authPass }}" onChange="{{ onAuthPass }}" placeholder="{{ t.password }}" type="password" style="padding: 13px 16px; border-radius: 12px; border: 1px solid #D4E0D3; font-size: 15px; outline: none;" style-focus="border-color: var(--acc);">
+          <sc-if value="{{ hasAuthError }}" hint-placeholder-val="{{ false }}">
+            <div style="background: #FBEAE8; border: 1px solid #F0C4C0; color: #C2453D; border-radius: 10px; padding: 10px 14px; font-size: 13px;">{{ authError }}</div>
+          </sc-if>
+          <button onClick="{{ submitAuth }}" style="background: #101B12; border: none; color: #fff; font-weight: 600; font-size: 16px; cursor: pointer; padding: 14px; border-radius: 12px; margin-top: 6px;" style-hover="background: #1E3325;">{{ authCta }}</button>
+        </div>
+        <div style="margin-top: 20px; font-size: 14px; color: #6B7F6E; text-align: center;">{{ authSwapText }} <a href="#" onClick="{{ swapAuth }}" style="font-weight: 600;">{{ authSwapLink }}</a></div>
+      </div>
+    </main>
+  </sc-if>
+
+  <!-- ============ PROFILE ============ -->
+  <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+    <main data-screen-label="Profile" style="flex: 1; max-width: 1000px; margin: 0 auto; padding: 40px 24px; width: 100%;">
+      <div style="background: #101B12; color: #F2F6F1; border-radius: 20px; padding: 28px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--acc); color: #101B12; display: grid; place-items: center; font-weight: 700; font-size: 26px;">AM</div>
+        <div style="flex: 1; min-width: 200px;">
+          <div style="font-size: 24px; font-weight: 700;">{{ userName }}</div>
+          <div style="font-size: 14px; color: #A8B8AC;">{{ t.memberSince }}</div>
+        </div>
+        <div style="text-align: center; padding: 0 18px;">
+          <div style="font-size: 28px; font-weight: 700; color: var(--acc);">4.8 ★</div>
+          <div style="font-size: 13px; color: #A8B8AC;">{{ reviewCount }} {{ t.reviewsWord }}</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 6px; margin: 28px 0 20px; flex-wrap: wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <button onClick="{{ t.pick }}" style="border: 1px solid {{ t.border }}; background: {{ t.bg }}; color: {{ t.color }}; padding: 9px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; cursor: pointer;">{{ t.name }}</button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ tabIsList }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ tabEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="background: #fff; border: 1px dashed #C9D6CB; border-radius: 16px; padding: 40px; text-align: center; color: #6B7F6E; font-size: 15px;">{{ tabEmptyText }}</div>
+        </sc-if>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;">
+          <sc-for list="{{ tabItems }}" as="it" hint-placeholder-count="2">
+            <div onClick="{{ it.open }}" style="background: #fff; border-radius: 16px; overflow: hidden; cursor: pointer; border: 1px solid #E1E9E0;" style-hover="box-shadow: 0 8px 20px rgba(16,27,18,0.08);">
+              <div style="height: 110px; background: repeating-linear-gradient(45deg, #E7EFE6, #E7EFE6 10px, #DFE9DE 10px, #DFE9DE 20px); display: grid; place-items: center;">
+                <span style="font-family: monospace; font-size: 11px; color: #6B7F6E; background: #fff; padding: 3px 8px; border-radius: 6px;">{{ it.cat }}</span>
+              </div>
+              <div style="padding: 14px;">
+                <div style="font-weight: 600; font-size: 15px; margin-bottom: 6px;">{{ it.name }}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-weight: 700; font-size: 16px; color: #0D7A38;">{{ it.priceFmt }}</span>
+                  <span style="font-size: 12px; font-weight: 600; color: {{ it.badgeColor }}; background: {{ it.badgeBg }}; padding: 3px 10px; border-radius: 999px;">{{ it.badge }}</span>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabIsReviews }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="2">
+            <div style="background: #fff; border: 1px solid #E1E9E0; border-radius: 16px; padding: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: 34px; height: 34px; border-radius: 50%; background: #E7EFE6; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #3D4E40;">{{ r.init }}</div>
+                  <span style="font-weight: 600; font-size: 15px;">{{ r.from }}</span>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                  <span style="color: #E8A317; font-size: 15px; letter-spacing: 2px;">{{ r.stars }}</span>
+                  <span style="font-size: 13px; color: #6B7F6E;">{{ r.date }}</span>
+                </div>
+              </div>
+              <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #3D4E40;">{{ r.text }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </main>
+  </sc-if>
+
+  <!-- ============ FORUM ============ -->
+  <sc-if value="{{ isForum }}" hint-placeholder-val="{{ false }}">
+    <main data-screen-label="Forum" style="flex: 1; max-width: 860px; margin: 0 auto; padding: 40px 24px; width: 100%;">
+      <h1 style="font-size: 36px; margin: 0 0 8px; letter-spacing: -1.5px;">{{ t.forumTitle }}</h1>
+      <p style="margin: 0 0 28px; color: #6B7F6E; font-size: 16px;">{{ t.forumSub }}</p>
+
+      <div style="background: #fff; border: 1px solid #E1E9E0; border-radius: 16px; padding: 20px; margin-bottom: 28px;">
+        <input value="{{ postTitle }}" onChange="{{ onPostTitle }}" placeholder="{{ t.postTitlePh }}" style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #D4E0D3; font-size: 15px; outline: none; margin-bottom: 10px;" style-focus="border-color: var(--acc);">
+        <textarea value="{{ postBody }}" onChange="{{ onPostBody }}" placeholder="{{ t.postBodyPh }}" rows="3" style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #D4E0D3; font-size: 15px; outline: none; resize: vertical;" style-focus="border-color: var(--acc);"></textarea>
+        <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+          <button onClick="{{ addPost }}" style="background: var(--acc); border: none; color: #101B12; font-weight: 700; font-size: 15px; cursor: pointer; padding: 10px 22px; border-radius: 10px;" style-hover="filter: brightness(1.1);">{{ t.publish }}</button>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <sc-for list="{{ posts }}" as="p" hint-placeholder-count="3">
+          <div style="background: #fff; border: 1px solid #E1E9E0; border-radius: 16px; padding: 22px;">
+            <div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+              <h3 style="margin: 0; font-size: 18px;">{{ p.title }}</h3>
+              <span style="font-size: 13px; color: #6B7F6E;">{{ p.author }} · {{ p.date }}</span>
+            </div>
+            <p style="margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: #3D4E40;">{{ p.body }}</p>
+            <button onClick="{{ p.toggle }}" style="border: none; background: none; color: #0D7A38; font-weight: 600; font-size: 14px; cursor: pointer; padding: 0;">{{ p.commentLabel }}</button>
+            <sc-if value="{{ p.open }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top: 14px; border-top: 1px solid #EDF3EC; padding-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+                <sc-for list="{{ p.comments }}" as="c" hint-placeholder-count="1">
+                  <div style="display: flex; gap: 10px;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #E7EFE6; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #3D4E40; flex-shrink: 0;">{{ c.init }}</div>
+                    <div style="background: #F2F6F1; border-radius: 12px; padding: 10px 14px; flex: 1;">
+                      <span style="font-weight: 600; font-size: 13px;">{{ c.author }}</span>
+                      <p style="margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: #3D4E40;">{{ c.text }}</p>
+                    </div>
+                  </div>
+                </sc-for>
+                <div style="display: flex; gap: 8px;">
+                  <input value="{{ p.draft }}" onChange="{{ p.onDraft }}" placeholder="{{ t.replyPh }}" style="flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid #D4E0D3; font-size: 14px; outline: none;" style-focus="border-color: var(--acc);">
+                  <button onClick="{{ p.addComment }}" style="background: #101B12; border: none; color: #fff; font-weight: 600; font-size: 14px; cursor: pointer; padding: 10px 18px; border-radius: 10px;" style-hover="background: #1E3325;">{{ t.replyBtn }}</button>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </main>
+  </sc-if>
+
+  <!-- ============ ADMIN ============ -->
+  <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+    <main data-screen-label="Admin" style="flex: 1; max-width: 1000px; margin: 0 auto; padding: 40px 24px; width: 100%;">
+      <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; flex-wrap: wrap;">
+        <h1 style="font-size: 36px; margin: 0; letter-spacing: -1.5px;">{{ t.adminTitle }}</h1>
+        <span style="font-size: 13px; font-weight: 700; color: #8A6D1A; background: #FAF0D2; padding: 4px 12px; border-radius: 999px;">{{ pendingCount }} {{ t.pendingWord }}</span>
+      </div>
+      <p style="margin: 0 0 28px; color: #6B7F6E; font-size: 16px;">{{ t.adminSub }}</p>
+      <sc-if value="{{ noPending }}" hint-placeholder-val="{{ false }}">
+        <div style="background: #fff; border: 1px dashed #C9D6CB; border-radius: 16px; padding: 40px; text-align: center; color: #6B7F6E; font-size: 15px;">{{ t.queueEmpty }}</div>
+      </sc-if>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <sc-for list="{{ pending }}" as="pi" hint-placeholder-count="2">
+          <div style="background: #fff; border: 1px solid #E1E9E0; border-radius: 16px; padding: 18px 20px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap;">
+            <div style="width: 84px; height: 64px; border-radius: 10px; background: repeating-linear-gradient(45deg, #E7EFE6, #E7EFE6 8px, #DFE9DE 8px, #DFE9DE 16px); flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 200px;">
+              <div style="font-weight: 600; font-size: 16px;">{{ pi.name }}</div>
+              <div style="font-size: 13px; color: #6B7F6E; margin-top: 3px;">{{ pi.cat }} · {{ t.listedBy }} {{ pi.seller }} · {{ t.startsAt }} {{ pi.startFmt }}</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button onClick="{{ pi.approve }}" style="background: var(--acc); border: none; color: #101B12; font-weight: 700; font-size: 14px; cursor: pointer; padding: 10px 18px; border-radius: 10px;" style-hover="filter: brightness(1.1);">✓ {{ t.approve }}</button>
+              <button onClick="{{ pi.reject }}" style="background: none; border: 1px solid #F0C4C0; color: #C2453D; font-weight: 600; font-size: 14px; cursor: pointer; padding: 10px 18px; border-radius: 10px;" style-hover="background: #FBEAE8;">✕ {{ t.reject }}</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ hasAdminMsg }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top: 18px; background: #E1F4E7; border: 1px solid #B8E2C6; color: #0D7A38; border-radius: 12px; padding: 12px 16px; font-size: 14px;">{{ adminMsg }}</div>
+      </sc-if>
+    </main>
+  </sc-if>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="background: #101B12; color: #A8B8AC; padding: 28px 24px; margin-top: 48px;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 14px;">
+      <span style="font-weight: 700; color: #F2F6F1;">BidAppSample</span>
+      <div style="display: flex; gap: 24px;">
+        <a href="#" onClick="{{ goHomeLink }}" style="color: #A8B8AC;">{{ t.navHome }}</a>
+        <a href="#" onClick="{{ goAuctionsLink }}" style="color: #A8B8AC;">{{ t.navAuctions }}</a>
+        <a href="#" onClick="{{ goForumLink }}" style="color: #A8B8AC;">{{ t.navForum }}</a>
+      </div>
+      <span>{{ t.footerNote }}</span>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#14A44D&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;#14A44D&quot;, &quot;#0E8A6B&quot;, &quot;#65A30D&quot;, &quot;#0F766E&quot;], &quot;section&quot;: &quot;Theme&quot;}, &quot;startLoggedIn&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const now = Date.now();
+    const m = 60000, h = 3600000, d = 86400000;
+    this.state = {
+      page: 'home', itemId: null, lang: 'en',
+      q: '', cat: 'All', sort: 'ending',
+      bidValue: '', bidError: '', bidOk: '',
+      wishlist: [1, 5],
+      user: null,
+      authEmail: '', authPass: '', regName: '', authError: '',
+      tab: 'items',
+      postTitle: '', postBody: '',
+      adminMsg: '',
+      items: [
+        { id: 1, name: 'Vintage Zenit-E Film Camera', cat: 'Electronics', start: 150, current: 320, end: now + 2 * h + 14 * m, loc: 'Cluj-Napoca', desc: 'Fully working Soviet-era 35mm SLR with Helios 44-2 lens. Light meter functional, minor cosmetic wear on the top plate. Comes with original leather case.', seller: { name: 'foto_vlad', rating: 4.9, sales: 41 }, bids: [ { user: 'ana.k', amount: 320, at: now - 22 * m }, { user: 'retro_dan', amount: 280, at: now - 3 * h }, { user: 'ana.k', amount: 200, at: now - 8 * h } ] },
+        { id: 2, name: 'Signed Exhibition Poster, 2019', cat: 'Art', start: 800, current: 1450, end: now + 45 * m, loc: 'București', desc: 'Limited exhibition poster, hand-signed by the artist. 70×100 cm, kept flat in acid-free sleeve. Certificate of authenticity included.', seller: { name: 'galeria_9', rating: 5.0, sales: 17 }, bids: [ { user: 'colecting', amount: 1450, at: now - 9 * m }, { user: 'mira_t', amount: 1300, at: now - 40 * m }, { user: 'colecting', amount: 1100, at: now - 2 * h }, { user: 'artfan22', amount: 900, at: now - 5 * h } ] },
+        { id: 3, name: '1987 Dacia 1300, restored', cat: 'Auto', start: 12000, current: 18500, end: now + 3 * d + 4 * h, loc: 'Pitești', desc: 'Full nut-and-bolt restoration finished in 2025. Original engine rebuilt, new interior in period-correct fabric, ITP valid until 2027. A genuine head-turner.', seller: { name: 'clasice_ro', rating: 4.7, sales: 8 }, bids: [ { user: 'george.b', amount: 18500, at: now - 6 * h }, { user: 'oldtimer_x', amount: 16000, at: now - d }, { user: 'george.b', amount: 13500, at: now - 2 * d } ] },
+        { id: 4, name: 'iPhone 13 Pro 256GB, Sierra Blue', cat: 'Electronics', start: 1800, current: 2350, end: now + 6 * h + 30 * m, loc: 'Timișoara', desc: 'Battery health 89%, always in case with screen protector. Box, cable and invoice included. No scratches, no repairs.', seller: { name: 'tech_resale', rating: 4.6, sales: 112 }, bids: [ { user: 'radu_m', amount: 2350, at: now - h }, { user: 'ella.p', amount: 2200, at: now - 4 * h }, { user: 'radu_m', amount: 2000, at: now - 7 * h }, { user: 'buyer_007', amount: 1850, at: now - 10 * h } ] },
+        { id: 5, name: 'Handwoven Maramureș Wool Rug', cat: 'Art', start: 400, current: 640, end: now + d + 2 * h, loc: 'Baia Mare', desc: 'Traditional 160×230 cm rug, hand-woven with natural dyes by a local artisan. Never used, from a smoke-free home.', seller: { name: 'casa_maramures', rating: 4.9, sales: 26 }, bids: [ { user: 'ioana.d', amount: 640, at: now - 5 * h }, { user: 'homely', amount: 520, at: now - 14 * h } ] },
+        { id: 6, name: 'Omega Seamaster, 1970s', cat: 'Collectibles', start: 5000, current: 7200, end: now + 5 * h + 12 * m, loc: 'București', desc: 'Automatic cal. 1012, recently serviced with papers. Original dial with beautiful patina, 36mm steel case. Runs +4s/day.', seller: { name: 'watch_vault', rating: 5.0, sales: 33 }, bids: [ { user: 'chrono_fan', amount: 7200, at: now - 30 * m }, { user: 'tudor.s', amount: 6800, at: now - 2 * h }, { user: 'chrono_fan', amount: 6000, at: now - 6 * h }, { user: 'lux_hunter', amount: 5200, at: now - 12 * h } ] },
+        { id: 7, name: 'Retro Pegas Bicycle, restored', cat: 'Collectibles', start: 700, current: 980, end: now + 12 * h + 45 * m, loc: 'Iași', desc: 'Classic Pegas frame repainted in original teal, new tyres, chain and Brooks-style saddle. Rides like new, looks like 1985.', seller: { name: 'velo_shop', rating: 4.8, sales: 54 }, bids: [ { user: 'bike_life', amount: 980, at: now - 2 * h }, { user: 'stefan.r', amount: 850, at: now - 9 * h } ] },
+        { id: 8, name: 'Handmade Leather Messenger Bag', cat: 'Fashion', start: 250, current: 310, end: now + 31 * m, loc: 'Brașov', desc: 'Full-grain vegetable-tanned leather, hand-stitched. Fits a 14" laptop. Brass hardware, ages beautifully.', seller: { name: 'atelier_petra', rating: 4.9, sales: 68 }, bids: [ { user: 'mihai_c', amount: 310, at: now - h }, { user: 'style.ana', amount: 270, at: now - 4 * h } ] }
+      ],
+      pendingItems: [
+        { id: 101, name: 'PS5 Console + 2 DualSense controllers', cat: 'Electronics', seller: 'gamer_alex', start: 1500 },
+        { id: 102, name: 'Antique Silver Spoon Set (12 pcs)', cat: 'Collectibles', seller: 'vintage_home', start: 900 },
+        { id: 103, name: 'Ski Set Atomic 170cm + boots 43', cat: 'Fashion', seller: 'munte_fan', start: 600 }
+      ],
+      posts: [
+        { id: 1, title: 'How do you spot a fair reserve price?', body: 'I keep seeing items start way below market value. Is that a strategy to attract bids, or am I missing something about how sellers set StartPrice here?', author: 'radu_m', date: '2 days ago', open: false, draft: '', comments: [ { author: 'watch_vault', text: 'Low start = more early bidders = momentum. The market corrects the price by the end, almost always.' }, { author: 'ana.k', text: 'Check the seller rating first. Good sellers with low starts are the best deals on the platform.' } ] },
+        { id: 2, title: 'Won my first auction — the Pegas bike! 🎉', body: 'Sniped it in the last 40 seconds. Seller shipped in 2 days, exactly as described. This community is great.', author: 'bike_life', date: '4 days ago', open: false, draft: '', comments: [ { author: 'velo_shop', text: 'Pleasure doing business! Enjoy the ride.' } ] },
+        { id: 3, title: 'Feature request: photo uploads for listings', body: 'Placeholders are fine for now but real photos would help a lot when judging condition. Anyone else want this prioritized?', author: 'ioana.d', date: '1 week ago', open: false, draft: '', comments: [] }
+      ]
+    };
+    this.cats = ['All', 'Electronics', 'Art', 'Auto', 'Collectibles', 'Fashion'];
+    this.i18n = {
+      en: {
+        navHome: 'Home', navAuctions: 'Auctions', navForum: 'Forum', navAdmin: 'Admin',
+        logout: 'Log out', signIn: 'Sign in', joinFree: 'Join free',
+        liveNow: 'live auctions right now',
+        heroA: 'Bid fresh.', heroB: 'Win', heroC: 'big', heroSub: 'The community marketplace where every item finds its highest bidder. List it, bid on it, win it.',
+        browseAuctions: 'Browse auctions', sellItem: 'Sell an item',
+        statBidsLabel: 'bids placed today', statRatingLabel: 'avg. seller rating',
+        tradedWeek: 'traded this week across {n} live listings',
+        endingSoon: 'Ending soon', seeAll: 'See all auctions →', photo: 'photo',
+        liveAuctionsTitle: 'Live auctions', searchPh: 'Search items…',
+        sortEnding: 'Ending soonest', sortAsc: 'Price: low → high', sortDesc: 'Price: high → low', sortNew: 'Newest',
+        itemsWord: 'items', bidsWord: 'bids',
+        back: 'Back to auctions', description: 'Description', startedAt: 'Started at',
+        completedSales: 'completed sales', viewProfile: 'View profile',
+        currentBid: 'Current bid', startedAtLower: 'started at', timeLeftLabel: 'Time left', bidsSoFar: 'bids so far',
+        endedSoldTo: 'Auction ended — sold to', placeBid: 'Place bid', bidHistory: 'Bid history',
+        noBids: 'No bids yet — be the first!', highest: 'HIGHEST',
+        username: 'Username', password: 'Password',
+        memberSince: 'Member since March 2026 · Bucharest', reviewsWord: 'reviews',
+        forumTitle: 'Community forum', forumSub: 'Tips, questions and stories from fellow bidders.',
+        postTitlePh: 'Post title…', postBodyPh: 'What\'s on your mind?', publish: 'Publish', replyPh: 'Write a reply…', replyBtn: 'Reply',
+        adminTitle: 'Item validation', pendingWord: 'pending',
+        adminSub: 'New listings wait here until an admin approves them. Rejected items never go live.',
+        queueEmpty: 'Queue is empty — all caught up ✓', listedBy: 'listed by', startsAt: 'starts at', approve: 'Approve', reject: 'Reject',
+        footerNote: 'Prototype — demo data only',
+        ended: 'Ended', minAgo: 'min ago', hAgo: 'h ago', dAgo: 'd ago',
+        authTitleReg: 'Create your account', authTitleLogin: 'Welcome back',
+        authSubReg: 'Join the community — list, bid, win.', authSubLogin: 'Sign in to bid and manage your listings.',
+        authCtaReg: 'Create account', authSwapTextReg: 'Already have an account?', authSwapTextLogin: 'New to BidAppSample?',
+        authSwapLinkReg: 'Sign in', authSwapLinkLogin: 'Create one',
+        fillAll: 'Please fill in all fields.',
+        signInToBid: 'Sign in to place a bid.', signInToPost: 'Sign in to post on the forum.',
+        enterBid: 'Enter a bid amount.', bidTooLow: 'Your bid must be higher than the current bid ({p}).',
+        youHighest: '✓ You are the highest bidder at {p}!',
+        inWishlist: '💚 In wishlist', addWishlist: '🤍 Add to wishlist',
+        tabMyItems: 'My items', tabWon: 'Won', tabWishlist: 'Wishlist', tabReviews: 'Reviews',
+        badgeLive: 'LIVE', badgeWon: 'WON 🏆',
+        emptyItems: 'You have no active listings.', emptyWon: 'No wins yet — keep bidding!', emptyWish: 'Your wishlist is empty. Tap the heart on any auction.',
+        hideReplies: 'Hide replies', replies: 'replies', reply: 'Reply',
+        approvedMsg: '✓ "{n}" approved — it is now live in Auctions.', rejectedMsg: '✕ "{n}" rejected and removed from the queue.',
+        cats: { All: 'All', Electronics: 'Electronics', Art: 'Art', Auto: 'Auto', Collectibles: 'Collectibles', Fashion: 'Fashion' },
+        dates: {}
+      },
+      ro: {
+        navHome: 'Acasă', navAuctions: 'Licitații', navForum: 'Forum', navAdmin: 'Admin',
+        logout: 'Ieși', signIn: 'Autentificare', joinFree: 'Cont gratuit',
+        liveNow: 'licitații live acum',
+        heroA: 'Licitează simplu.', heroB: 'Câștigă', heroC: 'mare', heroSub: 'Marketplace-ul comunității unde fiecare obiect ajunge la cel care oferă cel mai mult. Listează, licitează, câștigă.',
+        browseAuctions: 'Vezi licitațiile', sellItem: 'Vinde un obiect',
+        statBidsLabel: 'oferte plasate azi', statRatingLabel: 'rating mediu vânzători',
+        tradedWeek: 'tranzacționați săptămâna asta în {n} listări live',
+        endingSoon: 'Se termină curând', seeAll: 'Vezi toate licitațiile →', photo: 'foto',
+        liveAuctionsTitle: 'Licitații live', searchPh: 'Caută obiecte…',
+        sortEnding: 'Se termină curând', sortAsc: 'Preț: crescător', sortDesc: 'Preț: descrescător', sortNew: 'Cele mai noi',
+        itemsWord: 'obiecte', bidsWord: 'oferte',
+        back: 'Înapoi la licitații', description: 'Descriere', startedAt: 'A pornit de la',
+        completedSales: 'vânzări finalizate', viewProfile: 'Vezi profilul',
+        currentBid: 'Oferta curentă', startedAtLower: 'a pornit de la', timeLeftLabel: 'Timp rămas', bidsSoFar: 'oferte până acum',
+        endedSoldTo: 'Licitație încheiată — vândut lui', placeBid: 'Plasează oferta', bidHistory: 'Istoricul ofertelor',
+        noBids: 'Nicio ofertă încă — fii primul!', highest: 'CEA MAI MARE',
+        username: 'Nume utilizator', password: 'Parolă',
+        memberSince: 'Membru din martie 2026 · București', reviewsWord: 'recenzii',
+        forumTitle: 'Forumul comunității', forumSub: 'Sfaturi, întrebări și povești de la licitatori.',
+        postTitlePh: 'Titlul postării…', postBodyPh: 'La ce te gândești?', publish: 'Publică', replyPh: 'Scrie un răspuns…', replyBtn: 'Răspunde',
+        adminTitle: 'Validare obiecte', pendingWord: 'în așteptare',
+        adminSub: 'Listările noi așteaptă aici până le aprobă un admin. Cele respinse nu apar niciodată live.',
+        queueEmpty: 'Coada e goală — totul e la zi ✓', listedBy: 'listat de', startsAt: 'pornește de la', approve: 'Aprobă', reject: 'Respinge',
+        footerNote: 'Prototip — doar date demo',
+        ended: 'Încheiat', minAgo: 'min în urmă', hAgo: 'h în urmă', dAgo: 'z în urmă',
+        authTitleReg: 'Creează-ți contul', authTitleLogin: 'Bine ai revenit',
+        authSubReg: 'Alătură-te comunității — listează, licitează, câștigă.', authSubLogin: 'Autentifică-te ca să licitezi și să-ți administrezi listările.',
+        authCtaReg: 'Creează cont', authSwapTextReg: 'Ai deja cont?', authSwapTextLogin: 'Nou pe BidAppSample?',
+        authSwapLinkReg: 'Autentificare', authSwapLinkLogin: 'Creează unul',
+        fillAll: 'Completează toate câmpurile.',
+        signInToBid: 'Autentifică-te ca să plasezi o ofertă.', signInToPost: 'Autentifică-te ca să postezi pe forum.',
+        enterBid: 'Introdu o sumă.', bidTooLow: 'Oferta ta trebuie să fie mai mare decât oferta curentă ({p}).',
+        youHighest: '✓ Ești cel mai mare ofertant cu {p}!',
+        inWishlist: '💚 În wishlist', addWishlist: '🤍 Adaugă la wishlist',
+        tabMyItems: 'Obiectele mele', tabWon: 'Câștigate', tabWishlist: 'Wishlist', tabReviews: 'Recenzii',
+        badgeLive: 'LIVE', badgeWon: 'CÂȘTIGAT 🏆',
+        emptyItems: 'Nu ai listări active.', emptyWon: 'Niciun câștig încă — licitează în continuare!', emptyWish: 'Wishlist-ul tău e gol. Apasă inima pe orice licitație.',
+        hideReplies: 'Ascunde răspunsurile', replies: 'răspunsuri', reply: 'Răspunde',
+        approvedMsg: '✓ „{n}” aprobat — e acum live în Licitații.', rejectedMsg: '✕ „{n}” respins și scos din coadă.',
+        cats: { All: 'Toate', Electronics: 'Electronice', Art: 'Artă', Auto: 'Auto', Collectibles: 'Colecționabile', Fashion: 'Modă' },
+        dates: { '2 days ago': 'acum 2 zile', '4 days ago': 'acum 4 zile', '1 week ago': 'acum o săptămână', 'just now': 'chiar acum' }
+      }
+    };
+    this.reviews = [
+      { from: 'galeria_9', rating: 5, date: 'Jun 30, 2026', text: 'Paid instantly, great communication. Would gladly have them bid on my auctions again.' },
+      { from: 'tech_resale', rating: 5, date: 'Jun 12, 2026', text: 'Smooth transaction from start to finish. Recommended buyer.' },
+      { from: 'clasice_ro', rating: 4, date: 'May 28, 2026', text: 'Good buyer, slightly slow to confirm pickup but everything worked out.' }
+    ];
+    if (props && props.startLoggedIn) this.state.user = { name: 'andrei_m', role: 'admin' };
+  }
+
+  componentDidMount() {
+    this.timer = setInterval(() => this.forceUpdate(), 1000);
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+
+  fmt(n) { return n.toLocaleString('ro-RO').replace(/\u00a0/g, '.') + ' lei'; }
+
+  timeLeft(end) {
+    const diff = end - Date.now();
+    if (diff <= 0) return { label: this.i18n[this.state.lang].ended, urgent: false, ended: true };
+    const s = Math.floor(diff / 1000), dd = Math.floor(s / 86400), hh = Math.floor((s % 86400) / 3600), mm = Math.floor((s % 3600) / 60), ss = s % 60;
+    let label;
+    if (dd > 0) label = dd + 'd ' + hh + 'h';
+    else if (hh > 0) label = hh + 'h ' + mm + 'm';
+    else label = mm + 'm ' + String(ss).padStart(2, '0') + 's';
+    return { label, urgent: diff < 3600000, ended: false };
+  }
+
+  ago(at) {
+    const diff = Date.now() - at;
+    const mm = Math.floor(diff / 60000);
+    const LA = this.i18n[this.state.lang];
+    if (mm < 60) return mm + ' ' + LA.minAgo;
+    const hh = Math.floor(mm / 60);
+    if (hh < 24) return hh + LA.hAgo;
+    return Math.floor(hh / 24) + LA.dAgo;
+  }
+
+  itemVM(it) {
+    const t = this.timeLeft(it.end);
+    const wished = this.state.wishlist.includes(it.id);
+    return {
+      id: it.id, name: it.name, cat: this.i18n[this.state.lang].cats[it.cat] || it.cat, loc: it.loc,
+      priceFmt: this.fmt(it.current),
+      bidCount: it.bids.length,
+      timeLeft: t.label,
+      timeColor: t.urgent ? '#C2453D' : '#3D4E40',
+      timeBg: t.urgent ? '#FBEAE8' : '#EDF3EC',
+      heart: wished ? '💚' : '🤍',
+      open: () => this.setState({ page: 'item', itemId: it.id, bidValue: '', bidError: '', bidOk: '' }),
+      wish: () => this.toggleWish(it.id)
+    };
+  }
+
+  toggleWish(id) {
+    this.setState(s => ({ wishlist: s.wishlist.includes(id) ? s.wishlist.filter(x => x !== id) : s.wishlist.concat(id) }));
+  }
+
+  go(page) { return () => this.setState({ page, authError: '', adminMsg: '' }); }
+  goLink(page) { return (e) => { e.preventDefault(); this.setState({ page }); }; }
+
+  renderVals() {
+    const s = this.state;
+    const L = this.i18n[s.lang];
+    const acc = this.props.accent ?? '#14A44D';
+    if (typeof document !== 'undefined') document.documentElement.style.setProperty('--acc', acc);
+
+    const items = s.items;
+    const live = items.filter(it => it.end > Date.now());
+
+    // filtered + sorted catalog
+    let filtered = items.filter(it =>
+      (s.cat === 'All' || it.cat === s.cat) &&
+      (!s.q || it.name.toLowerCase().includes(s.q.toLowerCase()))
+    );
+    const sorters = {
+      ending: (a, b) => a.end - b.end,
+      priceAsc: (a, b) => a.current - b.current,
+      priceDesc: (a, b) => b.current - a.current,
+      newest: (a, b) => b.id - a.id
+    };
+    filtered = filtered.slice().sort(sorters[s.sort] || sorters.ending);
+
+    // selected item detail
+    const d = items.find(it => it.id === s.itemId) || items[0];
+    const dt = this.timeLeft(d.end);
+    const minBid = d.current + Math.max(10, Math.round(d.current * 0.02 / 10) * 10);
+    const incBase = d.current >= 10000 ? 500 : d.current >= 2000 ? 100 : d.current >= 500 ? 50 : 10;
+    const mkQuick = (mult) => () => {
+      const cur = parseInt(s.bidValue, 10) || d.current;
+      this.setState({ bidValue: String(cur + incBase * mult), bidError: '', bidOk: '' });
+    };
+    const dWished = s.wishlist.includes(d.id);
+
+    // profile tabs
+    const wonItem = { id: 7, name: 'Retro Pegas Bicycle, restored', cat: 'Collectibles', current: 980 };
+    const myItems = items.filter(it => it.id === 5 || it.id === 8);
+    const wishItems = items.filter(it => s.wishlist.includes(it.id));
+    const tabDefs = [
+      { key: 'items', name: L.tabMyItems },
+      { key: 'won', name: L.tabWon },
+      { key: 'wishlist', name: L.tabWishlist },
+      { key: 'reviews', name: L.tabReviews }
+    ];
+    const profVM = (it, badge, badgeColor, badgeBg) => ({
+      name: it.name, cat: L.cats[it.cat] || it.cat, priceFmt: this.fmt(it.current),
+      badge, badgeColor, badgeBg,
+      open: () => this.setState({ page: 'item', itemId: it.id, bidValue: '', bidError: '', bidOk: '' })
+    });
+    let tabItems = [], tabEmptyText = '';
+    if (s.tab === 'items') { tabItems = myItems.map(it => profVM(it, L.badgeLive, '#0D7A38', '#E1F4E7')); tabEmptyText = L.emptyItems; }
+    if (s.tab === 'won') { tabItems = [profVM(wonItem, L.badgeWon, '#8A6D1A', '#FAF0D2')]; tabEmptyText = L.emptyWon; }
+    if (s.tab === 'wishlist') { tabItems = wishItems.map(it => profVM(it, this.timeLeft(it.end).label, '#3D4E40', '#EDF3EC')); tabEmptyText = L.emptyWish; }
+
+    const isAuth = s.page === 'login' || s.page === 'register';
+    const isReg = s.page === 'register';
+
+    return {
+      // nav
+      goHome: this.go('home'), goAuctions: this.go('auctions'), goForum: this.go('forum'),
+      goProfile: this.go('profile'), goLogin: this.go('login'), goRegister: this.go('register'), goAdmin: this.go('admin'),
+      goHomeLink: this.goLink('home'), goAuctionsLink: this.goLink('auctions'), goForumLink: this.goLink('forum'),
+      backToAuctions: this.goLink('auctions'),
+      isHome: s.page === 'home', isAuctions: s.page === 'auctions', isItem: s.page === 'item',
+      isProfile: s.page === 'profile', isForum: s.page === 'forum', isAdmin: s.page === 'admin',
+      isAuth, isRegister: isReg,
+      isLoggedIn: !!s.user, isLoggedOut: !s.user,
+      isAdminUser: !!s.user && s.user.role === 'admin',
+      userName: s.user ? s.user.name : '',
+      logout: () => this.setState({ user: null, page: 'home' }),
+      t: L,
+      toggleLang: () => this.setState({ lang: s.lang === 'en' ? 'ro' : 'en' }),
+      langLabel: s.lang === 'en' ? 'RO' : 'EN',
+
+      // home
+      liveCount: live.length,
+      statBids: 132,
+      tradedLine: L.tradedWeek.replace('{n}', String(live.length)),
+      featured: live.slice().sort((a, b) => a.end - b.end).slice(0, 3).map(it => this.itemVM(it)),
+
+      // auctions
+      q: s.q, onQ: (e) => this.setState({ q: e.target.value }),
+      sort: s.sort, onSort: (e) => this.setState({ sort: e.target.value }),
+      cats: this.cats.map(c => ({
+        name: L.cats[c],
+        border: c === s.cat ? '#101B12' : '#D4E0D3',
+        bg: c === s.cat ? '#101B12' : '#fff',
+        color: c === s.cat ? '#fff' : '#3D4E40',
+        pick: () => this.setState({ cat: c })
+      })),
+      resultCount: filtered.length,
+      filtered: filtered.map(it => this.itemVM(it)),
+
+      // item detail
+      dName: d.name, dCat: L.cats[d.cat] || d.cat, dLoc: d.loc, dDesc: d.desc,
+      dPriceFmt: this.fmt(d.current), dStartPriceFmt: this.fmt(d.start), dStartFmt: this.fmt(d.start),
+      dSeller: d.seller.name, dSellerInit: d.seller.name.slice(0, 2).toUpperCase(),
+      dSellerRating: d.seller.rating.toFixed(1), dSellerSales: d.seller.sales,
+      dCountdown: dt.label, dTimeColor: dt.urgent ? '#F2A9A5' : '#F2F6F1',
+      dEnded: dt.ended, dActive: !dt.ended,
+      dBidCount: d.bids.length,
+      dTopBidder: d.bids.length ? d.bids[0].user : '—',
+      dWish: () => this.toggleWish(d.id),
+      dHeartLabel: dWished ? L.inWishlist : L.addWishlist,
+      noBids: d.bids.length === 0,
+      dBids: d.bids.map((b, i) => ({
+        user: b.user, init: b.user.slice(0, 2).toUpperCase(),
+        amountFmt: this.fmt(b.amount), when: this.ago(b.at),
+        top: i === 0, bg: i === 0 ? '#F0F9F2' : 'transparent'
+      })),
+      bidValue: s.bidValue,
+      onBidChange: (e) => this.setState({ bidValue: e.target.value.replace(/[^0-9]/g, ''), bidError: '', bidOk: '' }),
+      minBidHint: 'Min. ' + this.fmt(minBid),
+      inc1: incBase, inc2: incBase * 2, inc3: incBase * 5,
+      quick1: mkQuick(1), quick2: mkQuick(2), quick3: mkQuick(5),
+      placeBid: () => {
+        if (!s.user) { this.setState({ page: 'login', authError: L.signInToBid }); return; }
+        const amount = parseInt(s.bidValue, 10);
+        if (!amount) { this.setState({ bidError: L.enterBid }); return; }
+        if (amount <= d.current) { this.setState({ bidError: L.bidTooLow.replace('{p}', this.fmt(d.current)) }); return; }
+        this.setState(st => ({
+          items: st.items.map(it => it.id === d.id ? { ...it, current: amount, bids: [{ user: st.user.name, amount, at: Date.now() }].concat(it.bids) } : it),
+          bidValue: '', bidError: '',
+          bidOk: L.youHighest.replace('{p}', this.fmt(amount))
+        }));
+      },
+      hasBidError: !!s.bidError, bidError: s.bidError,
+      hasBidOk: !!s.bidOk, bidOk: s.bidOk,
+
+      // auth
+      authTitle: isReg ? L.authTitleReg : L.authTitleLogin,
+      authSub: isReg ? L.authSubReg : L.authSubLogin,
+      authCta: isReg ? L.authCtaReg : L.signIn,
+      authSwapText: isReg ? L.authSwapTextReg : L.authSwapTextLogin,
+      authSwapLink: isReg ? L.authSwapLinkReg : L.authSwapLinkLogin,
+      swapAuth: (e) => { e.preventDefault(); this.setState({ page: isReg ? 'login' : 'register', authError: '' }); },
+      authEmail: s.authEmail, onAuthEmail: (e) => this.setState({ authEmail: e.target.value }),
+      authPass: s.authPass, onAuthPass: (e) => this.setState({ authPass: e.target.value }),
+      regName: s.regName, onRegName: (e) => this.setState({ regName: e.target.value }),
+      hasAuthError: !!s.authError, authError: s.authError,
+      submitAuth: () => {
+        if (!s.authEmail || !s.authPass || (isReg && !s.regName)) { this.setState({ authError: L.fillAll }); return; }
+        const name = isReg ? s.regName : 'andrei_m';
+        this.setState({ user: { name, role: 'admin' }, page: 'home', authError: '', authEmail: '', authPass: '', regName: '' });
+      },
+
+      // profile
+      reviewCount: this.reviews.length,
+      tabs: tabDefs.map(t => ({
+        name: t.name,
+        border: t.key === s.tab ? '#101B12' : '#D4E0D3',
+        bg: t.key === s.tab ? '#101B12' : '#fff',
+        color: t.key === s.tab ? '#fff' : '#3D4E40',
+        pick: () => this.setState({ tab: t.key })
+      })),
+      tabIsList: s.tab !== 'reviews',
+      tabIsReviews: s.tab === 'reviews',
+      tabItems, tabEmpty: tabItems.length === 0, tabEmptyText,
+      reviews: this.reviews.map(r => ({
+        from: r.from, init: r.from.slice(0, 2).toUpperCase(),
+        stars: '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating),
+        date: r.date, text: r.text
+      })),
+
+      // forum
+      postTitle: s.postTitle, onPostTitle: (e) => this.setState({ postTitle: e.target.value }),
+      postBody: s.postBody, onPostBody: (e) => this.setState({ postBody: e.target.value }),
+      addPost: () => {
+        if (!s.postTitle.trim()) return;
+        if (!s.user) { this.setState({ page: 'login', authError: L.signInToPost }); return; }
+        const post = { id: Date.now(), title: s.postTitle.trim(), body: s.postBody.trim(), author: s.user.name, date: 'just now', open: false, draft: '', comments: [] };
+        this.setState(st => ({ posts: [post].concat(st.posts), postTitle: '', postBody: '' }));
+      },
+      posts: s.posts.map(p => ({
+        title: p.title, body: p.body, author: p.author, date: L.dates[p.date] || p.date,
+        open: p.open,
+        commentLabel: p.open ? L.hideReplies : (p.comments.length ? '💬 ' + p.comments.length + ' ' + L.replies : '💬 ' + L.reply),
+        toggle: () => this.setState(st => ({ posts: st.posts.map(x => x.id === p.id ? { ...x, open: !x.open } : x) })),
+        draft: p.draft,
+        onDraft: (e) => { const v = e.target.value; this.setState(st => ({ posts: st.posts.map(x => x.id === p.id ? { ...x, draft: v } : x) })); },
+        addComment: () => {
+          if (!p.draft.trim()) return;
+          const author = s.user ? s.user.name : 'guest';
+          this.setState(st => ({ posts: st.posts.map(x => x.id === p.id ? { ...x, draft: '', comments: x.comments.concat({ author, text: p.draft.trim() }) } : x) }));
+        },
+        comments: p.comments.map(c => ({ author: c.author, text: c.text, init: c.author.slice(0, 2).toUpperCase() }))
+      })),
+
+      // admin
+      pendingCount: s.pendingItems.length,
+      noPending: s.pendingItems.length === 0,
+      hasAdminMsg: !!s.adminMsg, adminMsg: s.adminMsg,
+      pending: s.pendingItems.map(pi => ({
+        name: pi.name, cat: L.cats[pi.cat] || pi.cat, seller: pi.seller, startFmt: this.fmt(pi.start),
+        approve: () => this.setState(st => ({
+          pendingItems: st.pendingItems.filter(x => x.id !== pi.id),
+          adminMsg: L.approvedMsg.replace('{n}', pi.name),
+          items: st.items.concat({ id: pi.id, name: pi.name, cat: pi.cat, start: pi.start, current: pi.start, end: Date.now() + 2 * 86400000, loc: 'București', desc: 'Newly approved listing.', seller: { name: pi.seller, rating: 4.5, sales: 3 }, bids: [] })
+        })),
+        reject: () => this.setState(st => ({
+          pendingItems: st.pendingItems.filter(x => x.id !== pi.id),
+          adminMsg: L.rejectedMsg.replace('{n}', pi.name)
+        }))
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

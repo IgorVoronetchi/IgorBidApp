@@ -1,0 +1,40 @@
+<main class="admin">
+  <div class="admin-head">
+    <h1 class="page-title" style="margin: 0;">{{ i18n.t().adminTitle }}</h1>
+    <span class="pending-pill">{{ pending().length }} {{ i18n.t().pendingWord }}</span>
+  </div>
+  <p class="admin-sub">{{ i18n.t().adminSub }}</p>
+
+  @if (pending().length === 0) {
+    <div class="empty-box">{{ i18n.t().queueEmpty }}</div>
+  }
+
+  <div class="queue">
+    @for (it of pending(); track it.id) {
+      <div class="card queue-item">
+        <div class="queue-photo">
+          @if (it.imageUrl) {
+            <img class="item-photo" [src]="it.imageUrl" alt="" />
+          } @else {
+            <div class="photo-ph fill"></div>
+          }
+        </div>
+        <div class="queue-info">
+          <div class="queue-name">{{ it.name }}</div>
+          <div class="queue-meta">
+            {{ i18n.cat(it.category) }} · {{ i18n.t().listedBy }} {{ it.ownerUserName }} ·
+            {{ i18n.t().startsAt }} {{ i18n.fmt(it.startPrice) }}
+          </div>
+        </div>
+        <div class="queue-actions">
+          <button class="btn-accent" (click)="approve(it)">✓ {{ i18n.t().approve }}</button>
+          <button class="reject-btn" (click)="reject(it)">✕ {{ i18n.t().reject }}</button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (message()) {
+    <div class="ok-box admin-msg">{{ message() }}</div>
+  }
+</main>

@@ -1,0 +1,36 @@
+<main class="auth-main">
+  <div class="auth-card">
+    <div class="auth-logo">B</div>
+    <h1>{{ isRegister() ? i18n.t().authTitleReg : i18n.t().authTitleLogin }}</h1>
+    <p class="auth-sub">{{ isRegister() ? i18n.t().authSubReg : i18n.t().authSubLogin }}</p>
+
+    <div class="auth-form">
+      @if (isRegister()) {
+        <input class="input" [(ngModel)]="userName" [placeholder]="i18n.t().username" autocomplete="username" />
+        <input class="input" [(ngModel)]="name" [placeholder]="i18n.t().fullName" autocomplete="name" />
+      }
+      <input class="input" [(ngModel)]="email" placeholder="Email" type="email" autocomplete="email" />
+      <input
+        class="input"
+        [(ngModel)]="password"
+        [placeholder]="i18n.t().password"
+        type="password"
+        [autocomplete]="isRegister() ? 'new-password' : 'current-password'"
+        (keyup.enter)="submit()"
+      />
+      @if (error()) {
+        <div class="error-box">{{ error() }}</div>
+      }
+      <button class="btn-dark submit-btn" (click)="submit()" [disabled]="busy()">
+        {{ isRegister() ? i18n.t().authCtaReg : i18n.t().authCtaLogin }}
+      </button>
+    </div>
+
+    <div class="auth-swap">
+      {{ isRegister() ? i18n.t().authSwapTextReg : i18n.t().authSwapTextLogin }}
+      <a [routerLink]="isRegister() ? '/login' : '/register'">
+        {{ isRegister() ? i18n.t().authSwapLinkReg : i18n.t().authSwapLinkLogin }}
+      </a>
+    </div>
+  </div>
+</main>

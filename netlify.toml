@@ -1,0 +1,11 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "frontend/dist/frontend/browser"
+
+# Angular e un SPA cu routing pe client - fara asta, un refresh pe /auctions
+# sau orice ruta non-radacina ar primi 404 de la Netlify.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,0 +1,57 @@
+<main class="forum">
+  <h1 class="page-title" style="margin-bottom: 8px;">{{ i18n.t().forumTitle }}</h1>
+  <p class="forum-sub">{{ i18n.t().forumSub }}</p>
+
+  <div class="card new-post">
+    @if (auth.isLoggedIn()) {
+      <input class="input" [(ngModel)]="postTitle" [placeholder]="i18n.t().postTitlePh" />
+      <textarea class="input" rows="3" [(ngModel)]="postBody" [placeholder]="i18n.t().postBodyPh"></textarea>
+      @if (error()) {
+        <div class="error-box">{{ error() }}</div>
+      }
+      <div class="new-post-actions">
+        <button class="btn-accent" (click)="addPost()">{{ i18n.t().publish }}</button>
+      </div>
+    } @else {
+      <div class="signin-note">
+        {{ i18n.t().signInToPost }} <a routerLink="/login">{{ i18n.t().signIn }}</a>
+      </div>
+    }
+  </div>
+
+  <div class="posts">
+    @for (p of posts(); track p.id) {
+      <div class="card post">
+        <div class="post-head">
+          <h3>{{ p.title }}</h3>
+          <span class="post-meta">{{ p.authorUserName }} · {{ ticker.ago(p.createdAt, i18n.t()) }}</span>
+        </div>
+        <p class="post-body">{{ p.description }}</p>
+        <button class="toggle-btn" (click)="toggle(p.id)">{{ commentLabel(p) }}</button>
+
+        @if (open().has(p.id)) {
+          <div class="comments">
+            @for (c of p.comments; track c.id) {
+              <div class="comment">
+                <div class="avatar cm-avatar">{{ c.authorUserName.slice(0, 2).toUpperCase() }}</div>
+                <div class="cm-bubble">
+                  <span class="cm-author">{{ c.authorUserName }}</span>
+                  <p>{{ c.text }}</p>
+                </div>
+              </div>
+            }
+            <div class="reply-row">
+              <input
+                class="input reply-input"
+                [(ngModel)]="drafts[p.id]"
+                [placeholder]="i18n.t().replyPh"
+                (keyup.enter)="addComment(p.id)"
+              />
+              <button class="btn-dark reply-btn" (click)="addComment(p.id)">{{ i18n.t().replyBtn }}</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</main>

@@ -1,0 +1,139 @@
+<main class="detail container">
+  <a routerLink="/auctions" class="back-link">← {{ i18n.t().back }}</a>
+
+  @if (item(); as it) {
+    <div class="detail-grid">
+      <div class="left-col">
+        <div class="main-photo">
+          @if (it.imageUrl) {
+            <img class="item-photo" [src]="it.imageUrl" alt="" />
+          } @else {
+            <div class="photo-ph fill">
+              <span>{{ i18n.cat(it.category) }} · {{ i18n.t().photo }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="card desc-card">
+          <h3>{{ i18n.t().description }}</h3>
+          <p>{{ it.description }}</p>
+          <div class="desc-meta">
+            <span>📍 {{ it.location }}</span>
+            <span>🏷 {{ i18n.cat(it.category) }}</span>
+            <span>{{ i18n.t().startedAt }} {{ fmtDate(it.startDate) }}</span>
+          </div>
+        </div>
+
+        <div class="card seller-card">
+          <div class="seller-row">
+            <div class="seller-avatar">{{ ownerInitial() }}</div>
+            <div class="seller-info">
+              <div class="seller-name">{{ it.ownerUserName }}</div>
+              <div class="seller-meta">
+                @if (it.ownerRating != null) { {{ it.ownerRating }} ★ · }
+                {{ it.ownerSales }} {{ i18n.t().completedSales }}
+              </div>
+            </div>
+            <a class="btn-ghost" [routerLink]="['/user', it.ownerId]">{{ i18n.t().viewProfile }}</a>
+          </div>
+        </div>
+
+        @if (isWinner() && !reviewSent()) {
+          <div class="card review-card">
+            <h3>{{ i18n.t().yourReview }}</h3>
+            <div class="review-form">
+              <select class="input rating-select" [(ngModel)]="reviewRating">
+                @for (r of [5, 4, 3, 2, 1]; track r) {
+                  <option [ngValue]="r">{{ '★'.repeat(r) }}</option>
+                }
+              </select>
+              <textarea class="input" rows="2" [(ngModel)]="reviewComment" [placeholder]="i18n.t().commentPh"></textarea>
+              @if (reviewError()) { <div class="error-box">{{ reviewError() }}</div> }
+              <button class="btn-accent" (click)="sendReview()">{{ i18n.t().sendReview }}</button>
+            </div>
+          </div>
+        }
+        @if (reviewSent()) {
+          <div class="ok-box" style="margin-top: 20px;">{{ i18n.t().reviewOk }}</div>
+        }
+      </div>
+
+      <div class="right-col">
+        <h1 class="item-title">{{ it.name }}</h1>
+        <button class="wish-toggle" (click)="toggleWish()">
+          {{ wishlist.has(it.id) ? i18n.t().inWishlist : i18n.t().addWishlist }}
+        </button>
+
+        <div class="bid-box">
+          <div class="bid-box-top">
+            <div>
+              <div class="bid-label">{{ i18n.t().currentBid }}</div>
+              <div class="bid-price">{{ i18n.fmt(it.currentPrice) }}</div>
+              <div class="bid-label">{{ i18n.t().startedAtLower }} {{ i18n.fmt(it.startPrice) }}</div>
+            </div>
+            <div class="bid-box-right">
+              <div class="bid-label">{{ i18n.t().timeLeftLabel }}</div>
+              @let tl = ticker.timeLeft(it.endDate, i18n.t());
+              <div class="countdown" [class.urgent]="tl.urgent">{{ tl.label }}</div>
+              <div class="bid-label">{{ it.bidCount }} {{ i18n.t().bidsSoFar }}</div>
+            </div>
+          </div>
+
+          @if (isEnded()) {
+            @if (it.status === 'Sold' || it.bids.length > 0) {
+              <div class="ended-banner">
+                🏆 {{ i18n.t().endedSoldTo }} <b>{{ it.winnerUserName || topBidder() }}</b> — {{ i18n.fmt(it.currentPrice) }}
+              </div>
+            } @else {
+              <div class="ended-banner muted">{{ i18n.t().endedNoWinner }}</div>
+            }
+          } @else if (!isOwner()) {
+            <div class="bid-controls">
+              <div class="bid-input-row">
+                <input
+                  class="bid-input"
+                  [(ngModel)]="bidValue"
+                  inputmode="numeric"
+                  [placeholder]="'≥ ' + i18n.fmt(minNextBid())"
+                  (keyup.enter)="placeBid()"
+                />
+                <button class="bid-btn" (click)="placeBid()" [disabled]="busy()">{{ i18n.t().placeBid }}</button>
+              </div>
+              <div class="quick-row">
+                @for (inc of increments(); track inc) {
+                  <button class="quick-btn" (click)="quickBid(inc)">+{{ inc }} lei</button>
+                }
+              </div>
+              @if (bidError()) { <div class="bid-error">{{ bidError() }}</div> }
+              @if (bidOk()) { <div class="bid-ok">{{ bidOk() }}</div> }
+            </div>
+          }
+        </div>
+
+        <div class="card history-card">
+          <h3>{{ i18n.t().bidHistory }}</h3>
+          @if (it.bids.length === 0) {
+            <div class="no-bids">{{ i18n.t().noBids }}</div>
+          }
+          <div class="bid-list">
+            @for (b of it.bids; track b.id; let first = $first) {
+              <div class="bid-row" [class.top]="first">
+                <div class="bid-row-left">
+                  <div class="avatar bid-avatar">{{ b.bidderUserName.slice(0, 2).toUpperCase() }}</div>
+                  <a class="bidder" [routerLink]="['/user', b.bidderId]">{{ b.bidderUserName }}</a>
+                  @if (first) {
+                    <span class="highest-tag">{{ i18n.t().highest }}</span>
+                  }
+                </div>
+                <div class="bid-row-right">
+                  <span class="bid-amount">{{ i18n.fmt(b.amount) }}</span>
+                  <span class="bid-when">{{ ticker.ago(b.placedAt, i18n.t()) }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</main>

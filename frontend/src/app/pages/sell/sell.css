@@ -1,0 +1,83 @@
+.sell-main {
+  flex: 1;
+  display: grid;
+  place-items: start center;
+  padding: 48px 24px;
+}
+
+.sell-card {
+  width: 100%;
+  max-width: 560px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 36px;
+}
+
+.sell-card h1 {
+  font-size: 28px;
+  margin: 0 0 6px;
+  letter-spacing: -1px;
+}
+
+.sell-sub {
+  margin: 0 0 24px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.sell-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sell-form label,
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.field-label { font-size: 14px; font-weight: 600; }
+
+.photo-drop {
+  border: 1px dashed var(--line-soft);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 500;
+}
+.photo-drop:hover { border-color: var(--acc); color: var(--acc-dark); }
+
+.photo-preview-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.photo-preview {
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+
+.remove-photo { font-weight: 500; }
+
+.row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.submit { padding: 13px; font-size: 16px; }
+
+@media (max-width: 520px) {
+  .row-2 { grid-template-columns: 1fr; }
+}
