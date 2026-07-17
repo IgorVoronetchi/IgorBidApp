@@ -1,0 +1,21 @@
+# .NET backend
+backend/bin/
+backend/obj/
+backend/bidapp.db
+backend/bidapp.db-shm
+backend/bidapp.db-wal
+.vs/
+
+# Python (Selenium tests)
+tests/selenium/__pycache__/
+tests/selenium/.pytest_cache/
+*.pyc
+
+# Practica2026Studenti reference clone - not part of the app, no need to version it here
+Practica2026Studenti/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Frontend has its own .gitignore (dist/, node_modules/, .angular/cache, etc.)
