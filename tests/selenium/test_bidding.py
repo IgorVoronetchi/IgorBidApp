@@ -64,8 +64,13 @@ def test_placing_a_valid_bid_updates_price(driver, wait, base_url):
     click(driver, driver.find_element("css selector", ".bid-btn"))
 
     wait.until(lambda d: d.find_elements("css selector", ".bid-ok"))
-    price_after = driver.find_element("css selector", ".bid-price").text
-    assert price_after != price_before, "Pretul curent nu s-a actualizat dupa oferta."
+    # Mesajul de succes apare inainte ca pagina sa termine refetch-ul itemului de la
+    # server, deci asteptam explicit schimbarea pretului in DOM (pe un backend remote,
+    # latenta de retea face vizibila cursa pe care local nu o observam).
+    wait.until(
+        lambda d: d.find_element("css selector", ".bid-price").text != price_before,
+        message="Pretul curent nu s-a actualizat dupa oferta.",
+    )
 
 
 def test_bid_below_current_price_is_rejected(driver, wait, base_url):
