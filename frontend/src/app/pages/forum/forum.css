@@ -104,3 +104,8 @@
   border-radius: 10px;
   font-size: 14px;
 }
+
+@media (max-width: 600px) {
+  .forum { padding: 20px 16px; }
+  .post { padding: 16px; }
+}

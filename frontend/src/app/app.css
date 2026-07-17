@@ -164,3 +164,44 @@
   .logo-name, .user-name { display: none; }
   .main-nav a { padding: 8px 10px; font-size: 14px; }
 }
+
+/* Pe telefon, header-ul trece pe doua randuri: logo + limba + cont sus,
+   navigatia dedesubt pe toata latimea — altfel continutul iese din ecran. */
+@media (max-width: 600px) {
+  .site-header { padding: 0 12px; }
+
+  .header-inner {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 10px 0;
+    row-gap: 6px;
+    gap: 8px;
+  }
+
+  .logo { margin-right: auto; }
+
+  .main-nav {
+    order: 10;
+    flex-basis: 100%;
+    justify-content: space-between;
+    gap: 0;
+  }
+  .main-nav a {
+    flex: 1;
+    text-align: center;
+    padding: 7px 4px;
+    font-size: 14px;
+  }
+
+  .lang-btn { padding: 6px 10px; }
+
+  .user-area { gap: 8px; }
+  .logout-btn { padding: 6px 10px; font-size: 13px; }
+
+  .guest-area { gap: 6px; }
+  .signin-link { padding: 6px 6px; font-size: 14px; }
+  .join-btn { padding: 8px 12px; font-size: 14px; }
+
+  .site-footer { padding: 22px 16px; }
+  .footer-inner { flex-direction: column; gap: 10px; }
+}

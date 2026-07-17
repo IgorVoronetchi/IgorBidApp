@@ -54,3 +54,8 @@
   text-align: center;
 }
 .auth-swap a { font-weight: 600; }
+
+@media (max-width: 600px) {
+  .auth-main { padding: 28px 16px; }
+  .auth-card { padding: 24px 20px; }
+}

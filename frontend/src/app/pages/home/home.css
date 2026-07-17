@@ -130,3 +130,15 @@
   justify-content: space-between;
   align-items: center;
 }
+
+@media (max-width: 600px) {
+  .hero { padding: 44px 16px 52px; }
+  .hero-inner { gap: 28px; }
+  .hero-copy p { font-size: 16px; margin-bottom: 24px; }
+  .cta-main, .cta-alt { padding: 12px 20px; font-size: 15px; flex: 1; text-align: center; }
+  .hero-stats { gap: 12px; }
+  .stat { padding: 16px; }
+  .stat-num { font-size: 26px; }
+  .featured { padding: 36px 16px; }
+  .featured-head h2 { font-size: 22px; }
+}

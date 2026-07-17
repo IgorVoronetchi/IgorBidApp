@@ -78,3 +78,10 @@
 .reject-btn:hover { background: var(--danger-bg); }
 
 .admin-msg { margin-top: 18px; }
+
+@media (max-width: 600px) {
+  .admin { padding: 20px 16px; }
+  .queue-item { padding: 14px; gap: 12px; }
+  .queue-actions { flex-basis: 100%; }
+  .queue-actions .btn-accent, .queue-actions .reject-btn { flex: 1; }
+}

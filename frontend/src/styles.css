@@ -155,7 +155,7 @@ input, select, textarea, button { font-family: 'Space Grotesk', system-ui, sans-
 
 .grid-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
   gap: 20px;
 }
 
@@ -210,3 +210,15 @@ input, select, textarea, button { font-family: 'Space Grotesk', system-ui, sans-
 }
 
 h1.page-title { font-size: 36px; margin: 0 0 24px; letter-spacing: -1.5px; }
+
+/* Ajustari globale pentru telefon: margini mai stranse, titluri mai compacte,
+   grila de carduri trece natural pe o singura coloana. */
+@media (max-width: 600px) {
+  .container { padding: 0 16px; }
+
+  h1.page-title { font-size: 28px; margin-bottom: 18px; }
+
+  .grid-cards { grid-template-columns: 1fr; gap: 16px; }
+
+  .empty-box { padding: 28px 16px; }
+}
