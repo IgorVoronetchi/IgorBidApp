@@ -1,7 +1,6 @@
 # Bid-App-Igor — Marketplace de licitații online
 
-Aplicație full-stack de licitații (un „eBay simplificat"), construită pornind de la arhitectura
-proiectului [Practica2026Studenti](https://github.com/cchw01/Practica2026Studenti) și designul „Bidly".
+Aplicație full-stack de licitații (un „eBay simplificat").
 
 - **Backend:** ASP.NET Core Web API (.NET 10) + EF Core + SQLite + JWT — folder `backend/`
 - **Frontend:** Angular 21 (standalone components + signals) — folder `frontend/`
